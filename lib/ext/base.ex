@@ -10,6 +10,8 @@ defmodule Ext.Base do
   @doc """
   Convert any type to string
   """
+  def to_atom(value), do: AtomicMap.convert(value, safe: false)
+
   def to_str(value) when is_atom(value), do: Atom.to_string(value)
   def to_str(value) when is_float(value), do: :erlang.float_to_binary(value, [:compact, { :decimals, 0 }])
   def to_str(value), do: inspect(value)
