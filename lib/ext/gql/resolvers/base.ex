@@ -44,7 +44,7 @@ defmodule Ext.Gql.Resolvers.Base do
       case get(schema, id, repo) do
         {:ok, entity} ->
           if entity_params[:extra] do
-            extra = Map.merge(Ext.Base.to_atom(entity.extra), entity_params.extra)
+            extra = Map.merge(Ext.Utils.Base.to_atom(entity.extra), entity_params.extra)
             Map.merge(entity_params, %{extra: extra})
           end
 
@@ -88,8 +88,16 @@ defmodule Ext.Gql.Resolvers.Base do
   defp get_config(repo \\ nil) do
     case :application.get_application(__MODULE__) do
       {:ok, app_name} ->
-        repo = if repo, do: repo, else: Application.get_env(app_name, :ecto_repos) |> List.first()
-        {app_name, repo}
+        cond do
+          repo ->
+            {app_name, repo}
+
+          true ->
+            case :application.get_env(app_name, :ecto_repos) do
+              {:ok, repos} -> {app_name, List.first(repos)}
+              _ -> {app_name, nil}
+            end
+        end
 
       _ ->
         {nil, nil}
