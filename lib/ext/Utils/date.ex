@@ -9,19 +9,19 @@ defmodule Ext.Utils.Date do
 
   ## Examples
 
-      iex> Ext.Date.shift_normalize(:minutes, 1.5)
+      iex> Ext.Utils.Date.shift_normalize(:minutes, 1.5)
       [seconds: 90]
 
-      iex> Ext.Date.shift_normalize(:hours, 1.51)
+      iex> Ext.Utils.Date.shift_normalize(:hours, 1.51)
       [seconds: 5436]
 
-      iex> Ext.Date.shift_normalize(:seconds, 1.51)
+      iex> Ext.Utils.Date.shift_normalize(:seconds, 1.51)
       [seconds: 1]
 
-      iex> Ext.Date.shift_normalize(:days, 1.5)
+      iex> Ext.Utils.Date.shift_normalize(:days, 1.5)
       [hours: 36]
 
-      iex> Ext.Date.shift_normalize(:minutes, -1.5)
+      iex> Ext.Utils.Date.shift_normalize(:minutes, -1.5)
       [seconds: -90]
 
   """
