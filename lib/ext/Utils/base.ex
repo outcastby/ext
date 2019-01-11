@@ -1,4 +1,4 @@
-defmodule Ext.Base do
+defmodule Ext.Utils.Base do
   @moduledoc false
   def to_int(value) do
     case :string.to_integer(value) do

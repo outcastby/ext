@@ -1,4 +1,4 @@
-defmodule Ext.Forms do
+defmodule Ext.Utils.Forms do
   @moduledoc false
   require Logger
   import Ecto.Changeset

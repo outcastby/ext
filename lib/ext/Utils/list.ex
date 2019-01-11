@@ -1,4 +1,4 @@
-defmodule Ext.List do
+defmodule Ext.Utils.List do
   require IEx
 
   def index_by(list, func) do

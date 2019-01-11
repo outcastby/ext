@@ -1,4 +1,4 @@
-defmodule Ext.Date do
+defmodule Ext.Utils.Date do
   def now do
     DateTime.utc_now() |> DateTime.truncate(:second)
   end
