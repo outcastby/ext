@@ -47,6 +47,10 @@ defmodule Ext.Ecto.Repo do
           __MODULE__.query!("set transaction isolation level repeatable read;")
         end
       end
+
+      def reload(%module{id: id}) do
+        get(module, id)
+      end
     end
   end
 end
