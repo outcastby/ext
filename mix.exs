@@ -24,6 +24,7 @@ defmodule Ext.MixProject do
       {:ecto_sql, "~> 3.0-rc"},
       {:atomic_map, "~> 0.8"},
       {:timex, "~> 3.1"},
+      {:absinthe, "~> 1.4.0"},
     ]
   end
 end
