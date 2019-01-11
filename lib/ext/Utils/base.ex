@@ -21,7 +21,7 @@ defmodule Ext.Utils.Base do
   def to_bool("true"), do: true
   def to_bool("false"), do: false
   def to_bool(nil), do: false
-  def to_bool(any_value), do: true
+  def to_bool(_any_value), do: true
 
   def get_in(object, list) do
     [source_column | path] = list
