@@ -22,13 +22,13 @@ defmodule Ext.Gql.Resolvers.Base do
       offset = args[:offset] || 0
 
       {:ok,
-        schema
-        |> repo.where(Map.drop(args, [:limit, :offset]))
-        |> repo.order_by(desc: :id)
-        |> Ecto.Query.limit(^page_limit)
-        |> Ecto.Query.offset(^offset)
-        |> repo.all()
-        |> repo.preload(preload)}
+       schema
+       |> repo.where(Map.drop(args, [:limit, :offset]))
+       |> repo.order_by(desc: :id)
+       |> Ecto.Query.limit(^page_limit)
+       |> Ecto.Query.offset(^offset)
+       |> repo.all()
+       |> repo.preload(preload)}
     end
   end
 
@@ -86,21 +86,8 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   defp get_config(repo \\ nil) do
-    case :application.get_application(__MODULE__) do
-      {:ok, app_name} ->
-        cond do
-          repo ->
-            {app_name, repo}
-
-          true ->
-            case :application.get_env(app_name, :ecto_repos) do
-              {:ok, repos} -> {app_name, List.first(repos)}
-              _ -> {app_name, nil}
-            end
-        end
-
-      _ ->
-        {nil, nil}
-    end
+    app_name = System.get_env("APP_NAME") |> String.to_atom()
+    repo = if repo, do: repo, else: Application.get_env(app_name, :ecto_repos) |> List.first()
+    {app_name, repo}
   end
 end
