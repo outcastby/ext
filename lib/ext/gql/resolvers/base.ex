@@ -60,6 +60,13 @@ defmodule Ext.Gql.Resolvers.Base do
     {_, repo} = get_config(repo)
 
     fn %{entity: entity_params}, _info ->
+      entity_params =
+        if :erlang.function_exported(schema, :default_state, 0) do
+          Map.merge(entity_params, schema.default_state)
+        else
+          entity_params
+        end
+
       entity = struct(schema) |> schema.changeset(entity_params) |> repo.insert!()
       {:ok, entity |> repo.reload()}
     end
