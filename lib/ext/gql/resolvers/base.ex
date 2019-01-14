@@ -69,7 +69,7 @@ defmodule Ext.Gql.Resolvers.Base do
 
           if default_state[:extra] do
             extra = Map.merge(entity_params.extra, default_state.extra)
-            Map.merge(Map.merge(entity_params, default_state), %{extra: extra})
+            Map.merge(entity_params, default_state) |> Map.merge(%{extra: extra})
           else
             Map.merge(entity_params, default_state)
           end
