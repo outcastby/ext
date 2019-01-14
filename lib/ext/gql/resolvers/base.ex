@@ -43,10 +43,13 @@ defmodule Ext.Gql.Resolvers.Base do
     fn %{id: id, entity: entity_params}, _info ->
       case get(schema, id, repo) do
         {:ok, entity} ->
-          if entity_params[:extra] do
-            extra = Map.merge(Ext.Utils.Base.to_atom(entity.extra), entity_params.extra)
-            Map.merge(entity_params, %{extra: extra})
-          end
+          entity_params =
+            if entity_params[:extra] do
+              extra = Map.merge(Ext.Utils.Base.to_atom(entity.extra), entity_params.extra)
+              Map.merge(entity_params, %{extra: extra})
+            else
+              entity_params
+            end
 
           entity |> schema.changeset(entity_params) |> repo.update()
 
@@ -62,7 +65,14 @@ defmodule Ext.Gql.Resolvers.Base do
     fn %{entity: entity_params}, _info ->
       entity_params =
         if :erlang.function_exported(schema, :default_state, 0) do
-          Map.merge(entity_params, schema.default_state)
+          default_state = schema.default_state
+
+          if default_state[:extra] do
+            extra = Map.merge(entity_params.extra, default_state.extra)
+            Map.merge(Map.merge(entity_params, default_state), %{extra: extra})
+          else
+            Map.merge(entity_params, default_state)
+          end
         else
           entity_params
         end
