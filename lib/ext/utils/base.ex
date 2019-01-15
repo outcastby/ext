@@ -1,4 +1,6 @@
 defmodule Ext.Utils.Base do
+  require Logger
+
   @moduledoc false
   def to_int(value) do
     case :string.to_integer(value) do
@@ -33,5 +35,16 @@ defmodule Ext.Utils.Base do
       length(path) == 0 -> new_value
       true -> __MODULE__.get_in(new_value, path)
     end
+  end
+
+  def check_env_variables do
+    env_content = File.read!(".env.sample")
+
+    env_array =
+      String.split(env_content, "export ", trim: true) |> Enum.map(fn x -> String.replace(x, ~r/=.+\n/, "") end)
+
+    Enum.each(env_array, fn env ->
+      unless System.get_env(env), do: Logger.error("Environment variable #{env} does not set")
+    end)
   end
 end
