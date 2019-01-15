@@ -37,8 +37,8 @@ defmodule Ext.Utils.Base do
     end
   end
 
-  def check_env_variables do
-    env_content = File.read!(".env.sample")
+  def check_env_variables(env_path \\ ".env.sample") do
+    env_content = File.read!(env_path)
 
     env_array =
       String.split(env_content, "export ", trim: true) |> Enum.map(fn x -> String.replace(x, ~r/=.+\n/, "") end)
