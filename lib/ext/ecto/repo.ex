@@ -32,6 +32,22 @@ defmodule Ext.Ecto.Repo do
         query |> where([entity], ^[{key, value}])
       end
 
+      def where_not(query, params) do
+        Enum.reduce(params, query, &compose_not_query/2)
+      end
+
+      defp compose_not_query({key, value}, query) when is_list(value) do
+        query |> where([entity], field(entity, ^key) not in ^value)
+      end
+
+      defp compose_not_query({key, nil}, query) do
+        query |> where([entity], not is_nil(field(entity, ^key)))
+      end
+
+      defp compose_not_query({key, value}, query) do
+        query |> where([entity], field(entity, ^key) != ^value)
+      end
+
       def batch_insert(schema_or_source, entries, batch, opts \\ []) do
         Enum.each(Enum.chunk_every(entries, batch), &Ecto.Repo.Schema.insert_all(__MODULE__, schema_or_source, &1, opts))
       end
