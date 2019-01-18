@@ -35,14 +35,14 @@ defmodule Mix.Helper do
 
     commands =
       if Enum.any?(commands, &(&1 in @depends_of_build_commands)) do
-        commands ++ ["build"]
+        ["build"] ++ commands
       else
         commands
       end
 
     commands =
       if Enum.any?(@auto_built_branches, &(branch =~ &1)) do
-        commands ++ ["build"]
+        ["build"] ++ commands
       else
         commands
       end
