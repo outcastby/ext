@@ -24,3 +24,4 @@ defmodule Mix.Tasks.Ext.HandleCommit do
     end)
   end
 end
+
