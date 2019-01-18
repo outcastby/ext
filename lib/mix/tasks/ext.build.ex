@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Ext.Build do
 
     Shell.exec(
       System.find_executable("docker"),
-      ["build", "--build-arg", "CLONE_BRANCH=#{branch}", "-f", Helper.settings().dockerfile, "-t", image_name, "."],
+      ["build", "--build-arg", "CLONE_BRANCH=#{branch}", "-f", Helper.settings().docker_file, "-t", image_name, "."],
       [{:line, 4096}]
     )
 
