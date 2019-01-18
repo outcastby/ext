@@ -16,11 +16,11 @@ defmodule Mix.Tasks.Ext.HandleCommit do
   @doc false
   def run(_args) do
     commands = Helper.lookup_commands_from_commit_message()
-    Helper.puts("Follow commands will be processed by comment message: #{inspect commands}")
+    Helper.puts("Follow commands will be processed by comment message: #{inspect(commands)}")
 
     commands
     |> Enum.each(fn command ->
-      apply(String.to_existing_atom("Elixir.Mix.Commands.#{String.capitalize(command)}"), :call, [])
+      apply("Elixir.Mix.Commands.#{String.capitalize(command)}" |> String.to_existing_atom(), :call, [])
     end)
   end
 end
