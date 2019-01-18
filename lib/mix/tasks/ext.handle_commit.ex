@@ -18,10 +18,14 @@ defmodule Mix.Tasks.Ext.HandleCommit do
     commands = Helper.lookup_commands_from_commit_message()
     Helper.puts("Follow commands will be processed by comment message: #{inspect(commands)}")
 
-    commands
-    |> Enum.each(fn command ->
-      apply("Elixir.Ext.Commands.#{String.capitalize(command)}" |> String.to_existing_atom(), :call, [])
-    end)
+    commands |> Enum.each(fn command -> possible_commands()[command].call() end)
+  end
+
+  def possible_commands do
+    %{
+      "build" => Ext.Commands.Build,
+      "uat" => Ext.Commands.Uat,
+      "staging" => Ext.Commands.Staging
+    }
   end
 end
-
