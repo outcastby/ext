@@ -47,6 +47,6 @@ defmodule Mix.Helper do
   end
 
   def settings do
-    Application.get_env(Mix.Project.config()[:app], :ecto_repos, [])
+    Application.get_env(Mix.Project.config()[:app], :ext, [])
   end
 end
