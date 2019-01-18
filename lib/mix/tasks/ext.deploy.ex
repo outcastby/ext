@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.ExtDeploy do
+defmodule Mix.Tasks.Ext.Deploy do
   use Mix.Task
   alias Mix.Helper
 
