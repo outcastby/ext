@@ -3,6 +3,6 @@ defmodule Mix.Commands.Staging do
   require Logger
 
   def call() do
-    Mix.Tasks.Deploy.run(["staging"])
+    Mix.Tasks.ExtDeploy.run(["staging"])
   end
 end

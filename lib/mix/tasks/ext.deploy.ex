@@ -2,7 +2,7 @@ defmodule Mix.Tasks.ExtDeploy do
   use Mix.Task
   require IEx
   require Logger
-  alias Mix.Tasks.Utils
+  alias Mix.Utils
 
   def run([env_name] = args) when length(args) == 1 do
     run([env_name, Utils.lookup_image_tag()])

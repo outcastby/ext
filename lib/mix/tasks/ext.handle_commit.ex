@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.Ext.HandleCommit do
   use Mix.Task
-  import Mix.Ecto
+  alias Mix.Utils
 
   @shortdoc "Handle commit message"
 

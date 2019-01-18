@@ -3,6 +3,6 @@ defmodule Mix.Commands.Uat do
   require Logger
 
   def call() do
-    Mix.Tasks.Deploy.run(["uat"])
+    Mix.Tasks.ExtDeploy.run(["uat"])
   end
 end
