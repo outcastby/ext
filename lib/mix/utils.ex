@@ -29,7 +29,7 @@ defmodule Mix.Utils do
     |> Enum.filter(&(&1 != ""))
     |> List.last()
     |> String.split("/")
-    |> Enum.filter(commands, &Enum.member?(Mix.Tasks.Utils.available_commands(), &1))
+    |> Enum.filter(commands, &Enum.member?(available_commands(), &1))
     |> enhance_by_default_commands()
   end
 
