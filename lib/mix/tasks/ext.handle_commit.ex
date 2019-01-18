@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.Ext.HandleCommit do
   use Mix.Task
-  alias Mix.Utils
+  alias Mix.Helper
 
   @shortdoc "Handle commit message"
 
@@ -15,8 +15,8 @@ defmodule Mix.Tasks.Ext.HandleCommit do
 
   @doc false
   def run(_args) do
-    commands = Utils.lookup_commands_from_commit_message()
-    Utils.puts("Follow commands will be processed by comment message: #{commands}")
+    commands = Helper.lookup_commands_from_commit_message()
+    Helper.puts("Follow commands will be processed by comment message: #{commands}")
 
     commands
     |> Enum.each(fn command ->

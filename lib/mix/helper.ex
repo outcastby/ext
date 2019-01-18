@@ -1,7 +1,4 @@
-defmodule Mix.Utils do
-  require IEx
-  require Logger
-
+defmodule Mix.Helper do
   @available_commands ["build", "staging", "uat", "prod"]
   @depends_of_build_commands ["staging", "uat", "prod"]
   @auto_built_branches ["develop", "master", "release", "hotfix"]
