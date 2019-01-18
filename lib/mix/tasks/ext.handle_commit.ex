@@ -20,7 +20,7 @@ defmodule Mix.Tasks.Ext.HandleCommit do
 
     commands
     |> Enum.each(fn command ->
-      apply("Elixir.Mix.Commands.#{String.capitalize(command)}" |> String.to_existing_atom(), :call, [])
+      apply("Elixir.Ext.Commands.#{String.capitalize(command)}" |> String.to_existing_atom(), :call, [])
     end)
   end
 end
