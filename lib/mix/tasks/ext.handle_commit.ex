@@ -23,9 +23,9 @@ defmodule Mix.Tasks.Ext.HandleCommit do
 
   def possible_commands do
     %{
-      "build" => Ext.Commands.Build,
-      "uat" => Ext.Commands.Uat,
-      "staging" => Ext.Commands.Staging
+      "build" => Mix.Commands.Build,
+      "uat" => Mix.Commands.Uat,
+      "staging" => Mix.Commands.Staging
     }
   end
 end
