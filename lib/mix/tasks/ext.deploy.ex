@@ -9,7 +9,7 @@ defmodule Mix.Tasks.ExtDeploy do
   def run([env_name, image_tag]) do
     Helper.puts("Deploy service arcade, #{env_name}, #{image_tag}")
 
-    Shell.exec(
+    Ext.Shell.exec(
       System.find_executable("ansible-playbook"),
       ["-i", "inventory", "playbook.yml", "--extra-vars", "env_name=#{env_name} image_tag=#{image_tag}"],
       [{:line, 4096}]

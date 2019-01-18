@@ -12,13 +12,13 @@ defmodule Mix.Tasks.Ext.Build do
     Helper.puts("Building 'arcade' branch is '#{branch}'")
     Helper.puts("Building 'arcade' Docker image as '#{image_name}'")
 
-    Shell.exec(
+    Ext.Shell.exec(
       System.find_executable("docker"),
       ["build", "--build-arg", "CLONE_BRANCH=#{branch}", "-f", Helper.settings()[:docker_file], "-t", image_name, "."],
       [{:line, 4096}]
     )
 
     Helper.puts("Pushing '#{image_name}' image into registry")
-    Shell.exec(System.find_executable("docker"), ["push", image_name], [{:line, 4096}])
+    Ext.Shell.exec(System.find_executable("docker"), ["push", image_name], [{:line, 4096}])
   end
 end
