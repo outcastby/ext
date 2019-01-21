@@ -6,10 +6,18 @@ defmodule Ext.Ecto.Repo do
 
       import Ecto.Query
 
-      defoverridable exists?: 2
+      defoverridable exists?: 2, get_by: 3, get_by!: 3
 
       def exists?(queryable, clauses, opts \\ []) do
         Ecto.Repo.Queryable.exists?(__MODULE__, Ecto.Query.where(queryable, [], ^Enum.to_list(clauses)), opts)
+      end
+
+      def get_by(queryable, clauses, opts) do
+        Ecto.Repo.Queryable.get_by(__MODULE__, queryable, Ext.Utils.Base.atomize_keys(clauses), opts)
+      end
+
+      def get_by!(queryable, clauses, opts) do
+        Ecto.Repo.Queryable.get_by!(__MODULE__, queryable, Ext.Utils.Base.atomize_keys(clauses), opts)
       end
 
       def first(query) do
@@ -17,7 +25,7 @@ defmodule Ext.Ecto.Repo do
       end
 
       def where(query, params) do
-        Enum.reduce(params, query, &compose_query/2)
+        Enum.reduce(Ext.Utils.Base.atomize_keys(params), query, &compose_query/2)
       end
 
       defp compose_query({key, value}, query) when is_list(value) do
@@ -30,6 +38,22 @@ defmodule Ext.Ecto.Repo do
 
       defp compose_query({key, value}, query) do
         query |> where([entity], ^[{key, value}])
+      end
+
+      def where_not(query, params) do
+        Enum.reduce(Ext.Utils.Base.atomize_keys(params), query, &compose_not_query/2)
+      end
+
+      defp compose_not_query({key, value}, query) when is_list(value) do
+        query |> where([entity], field(entity, ^key) not in ^value)
+      end
+
+      defp compose_not_query({key, nil}, query) do
+        query |> where([entity], not is_nil(field(entity, ^key)))
+      end
+
+      defp compose_not_query({key, value}, query) do
+        query |> where([entity], field(entity, ^key) != ^value)
       end
 
       def batch_insert(schema_or_source, entries, batch, opts \\ []) do
