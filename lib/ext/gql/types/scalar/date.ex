@@ -10,7 +10,7 @@ defmodule Ext.Gql.Types.Scalar.Date do
     Standard is ISO_8601. E.g. 2015-01-23
     """)
 
-    serialize(&Date.to_iso8601/1)
+    serialize(&serialize_date/1)
     parse(&parse_date/1)
   end
 
@@ -30,4 +30,7 @@ defmodule Ext.Gql.Types.Scalar.Date do
   defp parse_date(_) do
     :error
   end
+
+  defp serialize_date(value) when is_binary(value), do: value
+  defp serialize_date(value), do: Date.to_iso8601(value)
 end
