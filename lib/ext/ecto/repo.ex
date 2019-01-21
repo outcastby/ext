@@ -12,11 +12,11 @@ defmodule Ext.Ecto.Repo do
         Ecto.Repo.Queryable.exists?(__MODULE__, Ecto.Query.where(queryable, [], ^Enum.to_list(clauses)), opts)
       end
 
-      def get_by(queryable, clauses, opts \\ []) do
+      def get_by(queryable, clauses, opts) do
         Ecto.Repo.Queryable.get_by(__MODULE__, queryable, Ext.Utils.Base.atomize_keys(clauses), opts)
       end
 
-      def get_by!(queryable, clauses, opts \\ []) do
+      def get_by!(queryable, clauses, opts) do
         Ecto.Repo.Queryable.get_by!(__MODULE__, queryable, Ext.Utils.Base.atomize_keys(clauses), opts)
       end
 
