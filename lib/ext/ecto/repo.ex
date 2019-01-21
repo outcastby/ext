@@ -6,10 +6,18 @@ defmodule Ext.Ecto.Repo do
 
       import Ecto.Query
 
-      defoverridable exists?: 2
+      defoverridable exists?: 2, get_by: 3, get_by!: 3
 
       def exists?(queryable, clauses, opts \\ []) do
         Ecto.Repo.Queryable.exists?(__MODULE__, Ecto.Query.where(queryable, [], ^Enum.to_list(clauses)), opts)
+      end
+
+      def get_by(queryable, clauses, opts \\ []) do
+        Ecto.Repo.Queryable.get_by(__MODULE__, queryable, Ext.Utils.Base.atomize_keys(clauses), opts)
+      end
+
+      def get_by!(queryable, clauses, opts \\ []) do
+        Ecto.Repo.Queryable.get_by!(__MODULE__, queryable, Ext.Utils.Base.atomize_keys(clauses), opts)
       end
 
       def first(query) do
