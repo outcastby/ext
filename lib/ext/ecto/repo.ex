@@ -17,7 +17,7 @@ defmodule Ext.Ecto.Repo do
       end
 
       def where(query, params) do
-        Enum.reduce(params, query, &compose_query/2)
+        Enum.reduce(Ext.Utils.Base.atomize_keys(params), query, &compose_query/2)
       end
 
       defp compose_query({key, value}, query) when is_list(value) do
@@ -33,7 +33,7 @@ defmodule Ext.Ecto.Repo do
       end
 
       def where_not(query, params) do
-        Enum.reduce(params, query, &compose_not_query/2)
+        Enum.reduce(Ext.Utils.Base.atomize_keys(params), query, &compose_not_query/2)
       end
 
       defp compose_not_query({key, value}, query) when is_list(value) do

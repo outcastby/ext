@@ -14,6 +14,15 @@ defmodule Ext.Utils.Base do
   """
   def to_atom(value), do: AtomicMap.convert(value, safe: false)
 
+  def atomize_keys(map) do
+    for {key, val} <- map, into: %{} do
+      cond do
+        is_atom(key) -> {key, val}
+        true -> {String.to_atom(key), val}
+      end
+    end
+  end
+
   def to_str(value) when is_atom(value), do: Atom.to_string(value)
   def to_str(value) when is_float(value), do: :erlang.float_to_binary(value, [:compact, { :decimals, 0 }])
   def to_str(value), do: inspect(value)
