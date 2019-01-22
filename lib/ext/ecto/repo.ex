@@ -3,7 +3,6 @@ defmodule Ext.Ecto.Repo do
 
   defmacro __using__(_) do
     quote do
-
       import Ecto.Query
 
       defoverridable exists?: 2, get_by: 3, get_by!: 3
@@ -26,6 +25,15 @@ defmodule Ext.Ecto.Repo do
 
       def where(query, params) do
         Enum.reduce(Ext.Utils.Base.atomize_keys(params), query, &compose_query/2)
+      end
+
+      defp compose_query({key, value}, query) when is_tuple(value) do
+        case value do
+          {">", value} -> query |> where([entity], field(entity, ^key) > ^value)
+          {">=", value} -> query |> where([entity], field(entity, ^key) >= ^value)
+          {"<", value} -> query |> where([entity], field(entity, ^key) < ^value)
+          {"<=", value} -> query |> where([entity], field(entity, ^key) <= ^value)
+        end
       end
 
       defp compose_query({key, value}, query) when is_list(value) do
@@ -57,7 +65,10 @@ defmodule Ext.Ecto.Repo do
       end
 
       def batch_insert(schema_or_source, entries, batch, opts \\ []) do
-        Enum.each(Enum.chunk_every(entries, batch), &Ecto.Repo.Schema.insert_all(__MODULE__, schema_or_source, &1, opts))
+        Enum.each(
+          Enum.chunk_every(entries, batch),
+          &Ecto.Repo.Schema.insert_all(__MODULE__, schema_or_source, &1, opts)
+        )
       end
 
       def order_by(query, fields), do: from(en in query, order_by: ^fields)
