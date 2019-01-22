@@ -103,14 +103,8 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   defp get_config(repo \\ nil) do
-    cond do
-      System.get_env("APP_NAME") ->
-        app_name = System.get_env("APP_NAME") |> String.to_atom()
-        repo = if repo, do: repo, else: Application.get_env(app_name, :ecto_repos) |> List.first()
-        {app_name, repo}
-
-      true ->
-        {nil, nil}
-    end
+    app_name = Mix.Project.config()[:app]
+    repo = if repo, do: repo, else: Application.get_env(app_name, :ecto_repos) |> List.first()
+    {app_name, repo}
   end
 end
