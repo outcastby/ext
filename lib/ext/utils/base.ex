@@ -9,9 +9,8 @@ defmodule Ext.Utils.Base do
     end
   end
 
-  @doc """
-  Convert any type to string
-  """
+  def to_atom(value) when is_binary(value), do: String.to_atom(value)
+  def to_atom(value) when is_nil(value), do: nil
   def to_atom(value), do: AtomicMap.convert(value, safe: false)
 
   def atomize_keys(map) do
