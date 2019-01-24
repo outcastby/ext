@@ -9,7 +9,7 @@ defmodule Ext.Gql.Resolvers.Base do
       require IEx
 
       def send_errors(form, code \\ 400, message \\ "Validation Error") do
-        Ext.Gql.Resolvers.Base.send_errors(form, code, message)
+        __MODULE__.send_errors(form, code, message)
       end
     end
   end
@@ -42,7 +42,7 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def update(args) do
-    {schema, repo, form_schema} = parse_args(args)
+    {schema, repo, form_module} = parse_args(args)
     {_, repo} = get_config(repo)
 
     fn %{id: id, entity: entity_params}, _info ->
@@ -56,7 +56,7 @@ defmodule Ext.Gql.Resolvers.Base do
               entity_params
             end
 
-          case valid?(form_schema, entity_params) do
+          case valid?(form_module, entity_params) do
             true -> entity |> schema.changeset(entity_params) |> repo.update()
             form -> send_errors(form)
           end
@@ -68,7 +68,7 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def create(args) do
-    {schema, repo, form_schema} = parse_args(args)
+    {schema, repo, form_module} = parse_args(args)
     {_, repo} = get_config(repo)
 
     fn %{entity: entity_params}, _info ->
@@ -86,7 +86,7 @@ defmodule Ext.Gql.Resolvers.Base do
           entity_params
         end
 
-      case valid?(form_schema, entity_params) do
+      case valid?(form_module, entity_params) do
         true ->
           entity = struct(schema) |> schema.changeset(entity_params) |> repo.insert!()
           {:ok, entity |> repo.reload()}
@@ -116,12 +116,12 @@ defmodule Ext.Gql.Resolvers.Base do
     end
   end
 
-  defp parse_args(args), do: {get_in(args, [:schema]), get_in(args, [:repo]), get_in(args, [:form])}
+  defp parse_args(args), do: {args[:schema], args[:repo], args[:form]}
 
-  def valid?(form_schema, entity_params) do
+  def valid?(form_module, entity_params) do
     cond do
-      form_schema ->
-        form = form_schema.changeset(entity_params)
+      form_module ->
+        form = form_module.changeset(entity_params)
         if form.valid?, do: true, else: form
       true ->
         true

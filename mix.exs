@@ -26,6 +26,7 @@ defmodule Ext.MixProject do
       {:timex, "~> 3.1"},
       {:absinthe, "~> 1.4.0"},
       {:proper_case, "~> 1.0.2"},
+      {:jason, "~> 1.0"},
     ]
   end
 end
