@@ -9,9 +9,13 @@ defmodule Ext.Gql.Resolvers.Base do
       require IEx
 
       def send_errors(form, code \\ 400, message \\ "Validation Error") do
-        {:error, message: message, code: code, details: ProperCase.to_camel_case(Ext.Utils.Forms.error(form))}
+        Ext.Gql.Resolvers.Base.send_errors(form, code, message)
       end
     end
+  end
+
+  def send_errors(form, code \\ 400, message \\ "Validation Error") do
+    {:error, message: message, code: code, details: ProperCase.to_camel_case(Ext.Utils.Forms.error(form))}
   end
 
   def all(schema, preload \\ [], repo \\ nil) do
@@ -37,7 +41,8 @@ defmodule Ext.Gql.Resolvers.Base do
     fn %{id: id}, _ -> get(schema, id, repo) end
   end
 
-  def update(schema, repo \\ nil) do
+  def update(args) do
+    {schema, repo, form_schema} = parse_args(args)
     {_, repo} = get_config(repo)
 
     fn %{id: id, entity: entity_params}, _info ->
@@ -51,7 +56,10 @@ defmodule Ext.Gql.Resolvers.Base do
               entity_params
             end
 
-          entity |> schema.changeset(entity_params) |> repo.update()
+          case valid?(form_schema, entity_params) do
+            true -> entity |> schema.changeset(entity_params) |> repo.update()
+            form -> send_errors(form)
+          end
 
         {:error, message} ->
           {:error, message}
@@ -59,7 +67,8 @@ defmodule Ext.Gql.Resolvers.Base do
     end
   end
 
-  def create(schema, repo \\ nil) do
+  def create(args) do
+    {schema, repo, form_schema} = parse_args(args)
     {_, repo} = get_config(repo)
 
     fn %{entity: entity_params}, _info ->
@@ -77,8 +86,13 @@ defmodule Ext.Gql.Resolvers.Base do
           entity_params
         end
 
-      entity = struct(schema) |> schema.changeset(entity_params) |> repo.insert!()
-      {:ok, entity |> repo.reload()}
+      case valid?(form_schema, entity_params) do
+        true ->
+          entity = struct(schema) |> schema.changeset(entity_params) |> repo.insert!()
+          {:ok, entity |> repo.reload()}
+        form ->
+          send_errors(form)
+      end
     end
   end
 
@@ -99,6 +113,18 @@ defmodule Ext.Gql.Resolvers.Base do
     case schema |> repo.get(id) do
       nil -> {:error, "#{inspect(schema)} id #{id} not found"}
       entity -> {:ok, entity}
+    end
+  end
+
+  defp parse_args(args), do: {get_in(args, [:schema]), get_in(args, [:repo]), get_in(args, [:form])}
+
+  def valid?(form_schema, entity_params) do
+    cond do
+      form_schema ->
+        form = form_schema.changeset(entity_params)
+        if form.valid?, do: true, else: form
+      true ->
+        true
     end
   end
 
