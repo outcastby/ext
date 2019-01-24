@@ -25,6 +25,7 @@ defmodule Ext.MixProject do
       {:atomic_map, "~> 0.8"},
       {:timex, "~> 3.1"},
       {:absinthe, "~> 1.4.0"},
+      {:proper_case, "~> 1.0.2"},
     ]
   end
 end

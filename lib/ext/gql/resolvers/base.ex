@@ -9,7 +9,7 @@ defmodule Ext.Gql.Resolvers.Base do
       require IEx
 
       def send_errors(form, code \\ 400, message \\ "Validation Error") do
-        {:error, message: message, code: code, details: Ext.Utils.Forms.error(form)}
+        {:error, message: message, code: code, details: ProperCase.to_camel_case(Ext.Utils.Forms.error(form))}
       end
     end
   end
@@ -102,7 +102,7 @@ defmodule Ext.Gql.Resolvers.Base do
     end
   end
 
-  defp get_config(repo \\ nil) do
+  defp get_config(repo) do
     app_name = Mix.Project.config()[:app]
     repo = if repo, do: repo, else: Application.get_env(app_name, :ecto_repos) |> List.first()
     {app_name, repo}
