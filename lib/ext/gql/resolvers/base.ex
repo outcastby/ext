@@ -41,8 +41,12 @@ defmodule Ext.Gql.Resolvers.Base do
     fn %{id: id}, _ -> get(schema, id, repo) end
   end
 
-  def update(args) do
+  def update(args) when is_map(args) do
     {schema, repo, form_module} = parse_args(args)
+    update(schema, repo, form_module)
+  end
+
+  def update(schema, repo \\ nil, form_module \\ nil) do
     {_, repo} = get_config(repo)
 
     fn %{id: id, entity: entity_params}, _info ->
@@ -67,8 +71,12 @@ defmodule Ext.Gql.Resolvers.Base do
     end
   end
 
-  def create(args) do
+  def create(args) when is_map(args) do
     {schema, repo, form_module} = parse_args(args)
+    create(schema, repo, form_module)
+  end
+
+  def create(schema, repo \\ nil, form_module \\ nil) do
     {_, repo} = get_config(repo)
 
     fn %{entity: entity_params}, _info ->
