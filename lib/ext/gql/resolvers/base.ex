@@ -24,10 +24,10 @@ defmodule Ext.Gql.Resolvers.Base do
     fn args, _ ->
       page_limit = args[:limit] || Application.get_env(app_name, :page_limit) || 20
       offset = args[:offset] || 0
-
+      filter = Jason.decode!(args[:filter] || "{}")
       {:ok,
        schema
-       |> repo.where(Map.drop(args, [:limit, :offset]))
+       |> repo.where(filter)
        |> repo.order_by(desc: :id)
        |> Ecto.Query.limit(^page_limit)
        |> Ecto.Query.offset(^offset)
