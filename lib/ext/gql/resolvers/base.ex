@@ -19,7 +19,7 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def all(schema, preload \\ [], repo \\ nil) do
-    {app_name, repo} = get_config(repo)
+    {app_name, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn args, _ ->
       page_limit = args[:limit] || Application.get_env(app_name, :page_limit) || 20
@@ -37,7 +37,7 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def find(schema, repo \\ nil) do
-    {_app_name, repo} = get_config(repo)
+    {_app_name, repo} = Ext.Utils.Repo.get_config(repo)
     fn %{id: id}, _ -> get(schema, id, repo) end
   end
 
@@ -47,7 +47,7 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def update(schema, repo \\ nil, form_module \\ nil) do
-    {_, repo} = get_config(repo)
+    {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{id: id, entity: entity_params}, _info ->
       case get(schema, id, repo) do
@@ -77,7 +77,7 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def create(schema, repo \\ nil, form_module \\ nil) do
-    {_, repo} = get_config(repo)
+    {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{entity: entity_params}, _info ->
       entity_params =
@@ -105,7 +105,7 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def delete(schema, repo \\ nil) do
-    {_, repo} = get_config(repo)
+    {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{id: id}, _info ->
       case get(schema, id, repo) do
@@ -116,7 +116,7 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def get(schema, id, repo \\ nil) do
-    {_, repo} = get_config(repo)
+    {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     case schema |> repo.get(id) do
       nil -> {:error, "#{inspect(schema)} id #{id} not found"}
@@ -134,11 +134,5 @@ defmodule Ext.Gql.Resolvers.Base do
       true ->
         true
     end
-  end
-
-  defp get_config(repo) do
-    app_name = Mix.Project.config()[:app]
-    repo = if repo, do: repo, else: Application.get_env(app_name, :ecto_repos) |> List.first()
-    {app_name, repo}
   end
 end
