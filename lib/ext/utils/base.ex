@@ -22,8 +22,10 @@ defmodule Ext.Utils.Base do
     end
   end
 
+  def snake_keys(map), do: ProperCase.to_snake_case(map)
+
   def to_str(value) when is_atom(value), do: Atom.to_string(value)
-  def to_str(value) when is_float(value), do: :erlang.float_to_binary(value, [:compact, { :decimals, 0 }])
+  def to_str(value) when is_float(value), do: :erlang.float_to_binary(value, [:compact, {:decimals, 0}])
   def to_str(value), do: inspect(value)
 
   def to_negative(value), do: -1 * value

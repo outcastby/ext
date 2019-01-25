@@ -27,12 +27,17 @@ defmodule Ext.Ecto.Repo do
         Enum.reduce(Ext.Utils.Base.atomize_keys(params), query, &compose_query/2)
       end
 
+      defp compose_query({key, value}, query) when is_map(value) do
+        compose_query({key, {value[:type] || value["type"], value["value"] || value[:value]}}, query)
+      end
+
       defp compose_query({key, value}, query) when is_tuple(value) do
         case value do
           {">", value} -> query |> where([entity], field(entity, ^key) > ^value)
           {">=", value} -> query |> where([entity], field(entity, ^key) >= ^value)
           {"<", value} -> query |> where([entity], field(entity, ^key) < ^value)
           {"<=", value} -> query |> where([entity], field(entity, ^key) <= ^value)
+          {"=", value} -> compose_query({key, value}, query)
         end
       end
 

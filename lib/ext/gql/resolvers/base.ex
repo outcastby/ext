@@ -24,15 +24,22 @@ defmodule Ext.Gql.Resolvers.Base do
     fn args, _ ->
       page_limit = args[:limit] || Application.get_env(app_name, :page_limit) || 20
       offset = args[:offset] || 0
-      filter = Jason.decode!(args[:filter] || "{}")
-      {:ok,
-       schema
-       |> repo.where(filter)
-       |> repo.order_by(desc: :id)
-       |> Ecto.Query.limit(^page_limit)
-       |> Ecto.Query.offset(^offset)
-       |> repo.all()
-       |> repo.preload(preload)}
+      filter = Jason.decode!(args[:filter] || "{}") |> Ext.Utils.Base.snake_keys()
+      try do
+        entities =
+          schema
+          |> repo.where(filter)
+          |> repo.order_by(desc: :id)
+          |> Ecto.Query.limit(^page_limit)
+          |> Ecto.Query.offset(^offset)
+          |> repo.all()
+          |> repo.preload(preload)
+
+        {:ok, entities}
+      rescue
+        e in Ecto.QueryError-> {:error, e.message}
+        e in Ecto.Query.CastError-> {:error, e.message}
+      end
     end
   end
 
