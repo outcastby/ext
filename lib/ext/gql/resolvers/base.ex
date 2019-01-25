@@ -9,7 +9,7 @@ defmodule Ext.Gql.Resolvers.Base do
       require IEx
 
       def send_errors(form, code \\ 400, message \\ "Validation Error") do
-        __MODULE__.send_errors(form, code, message)
+        Ext.Gql.Resolvers.Base.send_errors(form, code, message)
       end
     end
   end
