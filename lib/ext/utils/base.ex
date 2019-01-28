@@ -38,7 +38,10 @@ defmodule Ext.Utils.Base do
   def get_in(object, list) do
     [source_column | path] = list
 
-    new_value = Map.get(object, source_column) || Map.get(object, to_str(source_column))
+    new_value =
+      if is_nil(Map.get(object, source_column)),
+        do: Map.get(object, to_str(source_column)),
+        else: Map.get(object, source_column)
 
     cond do
       new_value == nil -> nil
