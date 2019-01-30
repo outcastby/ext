@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Ext.Deploy do
   end
 
   def run([env_name, image_tag]) do
-    Helper.puts("Deploy service arcade. Environment=#{env_name}. Image=#{image_tag}")
+    Helper.puts("Deploy service #{Mix.Project.config()[:app]}. Environment=#{env_name}. Image=#{image_tag}")
 
     Ext.Shell.exec(
       System.find_executable("ansible-playbook"),
