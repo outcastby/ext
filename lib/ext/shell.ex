@@ -12,7 +12,7 @@ defmodule Ext.Shell do
         handle_output(port)
       {^port, {:exit_status, status}} ->
         status
-        System.stop(1)
+        exit("Shell script stoped with error")
     end
   end
 end
