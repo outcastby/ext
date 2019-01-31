@@ -67,7 +67,7 @@ defmodule Ext.Gql.Resolvers.Base do
               entity_params
             end
 
-          case valid?(form_module, entity_params) do
+          case valid?(form_module, Map.merge(entity_params, %{id: id})) do
             true -> entity |> schema.changeset(entity_params) |> repo.update()
             form -> send_errors(form)
           end

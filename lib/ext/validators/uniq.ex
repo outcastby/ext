@@ -1,16 +1,26 @@
 defmodule Ext.Validators.Uniq do
   import Ecto.Changeset
+  require IEx
 
   def call(form, args) do
     {schema, repo, fields, message} = parse_args(args)
     {_, repo} = Ext.Utils.Repo.get_config(repo)
     message = if message, do: message, else: "Not unique"
 
-    cond do
-      schema |> repo.exists?(Map.take(form.changes, fields)) ->
-        form |> add_error(List.first(fields), message)
-      true ->
-        form
+    checked_fields = Map.take(form.changes, fields)
+
+    if Blankable.blank?(checked_fields) do
+      form
+    else
+      cond do
+        schema
+        |> repo.where_not(%{id: form.changes[:id]})
+        |> repo.exists?(Map.take(form.changes, fields)) ->
+          form |> add_error(List.first(fields), message)
+
+        true ->
+          form
+      end
     end
   end
 
