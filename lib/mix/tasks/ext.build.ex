@@ -4,13 +4,13 @@ defmodule Mix.Tasks.Ext.Build do
 
   @doc false
   def run(args) do
-    Helper.puts("Build service arcade")
+    Helper.puts("Build service #{Mix.Project.config()[:app]}")
     {branch, _} = System.cmd("git", ["symbolic-ref", "--short", "-q", "HEAD"])
 
     image_name = Helper.lookup_image_name(args && List.first(args))
 
-    Helper.puts("Building 'arcade' branch is '#{branch}'")
-    Helper.puts("Building 'arcade' Docker image as '#{image_name}'")
+    Helper.puts("Building '#{Mix.Project.config()[:app]}' branch is '#{branch}'")
+    Helper.puts("Building '#{Mix.Project.config()[:app]}' Docker image as '#{image_name}'")
 
     Ext.Shell.exec(
       System.find_executable("docker"),
