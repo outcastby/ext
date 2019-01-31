@@ -18,7 +18,7 @@ defmodule Ext.Shell do
 
       {^port, {:exit_status, status}} ->
         case status do
-          "0" -> status
+          0 -> status
           _ -> exit("Shell script stoped with error, status - #{status}")
         end
     end
