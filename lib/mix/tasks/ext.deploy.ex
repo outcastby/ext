@@ -31,7 +31,7 @@ defmodule Mix.Tasks.Ext.Deploy do
 
     Ext.Commands.SendToSlack.call(
       Helper.settings()[:slack_token], Helper.settings()[:slack_channel],
-      ":rocket: :rocket: :rocket: UAT => arcade => build v.develop-500fa8a =>  DELIVERED :tada: :tada: :tada:"
+      ":rocket: :rocket: :rocket: #{env_name} => #{Mix.Project.config()[:app]} => build #{image_tag} =>  DELIVERED :tada: :tada: :tada:"
     )
   end
 end
