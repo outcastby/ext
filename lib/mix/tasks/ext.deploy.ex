@@ -15,6 +15,7 @@ defmodule Mix.Tasks.Ext.Deploy do
   end
 
   def run([env_name, image_tag, is_fast]) do
+    HTTPoison.start()
     Helper.puts("Deploy service #{Mix.Project.config()[:app]}. Environment=#{env_name}. Image=#{image_tag}")
 
     args = ["-i", "inventory", "playbook.yml", "--extra-vars", "env_name=#{env_name} image_tag=#{image_tag}"]
@@ -28,7 +29,6 @@ defmodule Mix.Tasks.Ext.Deploy do
       end
 
     Ext.Shell.exec(System.find_executable("ansible-playbook"), args, [{:line, 4096}])
-    Helper.puts("Token #{Helper.settings()[:slack_token]}. Channel #{Helper.settings()[:slack_channel]}")
 
     Ext.Commands.SendToSlack.call(
       Helper.settings()[:slack_token], Helper.settings()[:slack_channel],
