@@ -28,6 +28,7 @@ defmodule Mix.Tasks.Ext.Deploy do
       end
 
     Ext.Shell.exec(System.find_executable("ansible-playbook"), args, [{:line, 4096}])
+    Helper.puts("Token #{Helper.settings()[:slack_token]}. Channel #{Helper.settings()[:slack_channel]}")
 
     Ext.Commands.SendToSlack.call(
       Helper.settings()[:slack_token], Helper.settings()[:slack_channel],
