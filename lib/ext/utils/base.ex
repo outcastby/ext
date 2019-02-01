@@ -60,15 +60,4 @@ defmodule Ext.Utils.Base do
       unless System.get_env(env), do: Logger.error("Environment variable #{env} does not set")
     end)
   end
-
-  def generate_uniq_hash(schema, column, length \\ 35) do
-    hash = :crypto.strong_rand_bytes(length) |> Base.url_encode64()
-
-    result = schema |> Arcade.Repo.exists?(%{column => hash})
-
-    cond do
-      result -> generate_uniq_hash(schema, column, length)
-      true -> hash
-    end
-  end
 end
