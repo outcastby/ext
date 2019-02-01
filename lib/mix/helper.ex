@@ -26,7 +26,8 @@ defmodule Mix.Helper do
     |> Enum.filter(&(&1 != ""))
     |> List.last()
     |> String.split("/")
-    |> Enum.filter(&Enum.member?(@available_commands, &1))
+    |> Enum.map(&String.split(&1, "~"))
+    |> Enum.filter(&Enum.member?(@available_commands, List.first(&1)))
     |> enhance_by_default_commands()
   end
 
@@ -34,20 +35,20 @@ defmodule Mix.Helper do
     branch = lookup_branch()
 
     commands =
-      if Enum.any?(commands, &(&1 in @depends_of_build_commands)) do
-        ["build"] ++ commands
+      if Enum.any?(commands, &(List.first(&1) in @depends_of_build_commands)) do
+        [["build"]] ++ commands
       else
         commands
       end
 
     commands =
       if Enum.any?(@auto_built_branches, &(branch =~ &1)) do
-        ["build"] ++ commands
+        [["build"]] ++ commands
       else
         commands
       end
 
-    commands |> Enum.uniq()
+    commands |> Enum.uniq_by(&List.first(&1))
   end
 
   def settings do

@@ -18,7 +18,7 @@ defmodule Mix.Tasks.Ext.HandleCommit do
     commands = Helper.lookup_commands_from_commit_message()
     Helper.puts("Follow commands will be processed by comment message: #{inspect(commands)}")
 
-    commands |> Enum.each(fn command -> possible_commands()[command].call() end)
+    commands |> Enum.each(fn command -> possible_commands()[List.first(command)].call(Enum.at(command, 1)) end)
   end
 
   def possible_commands do
