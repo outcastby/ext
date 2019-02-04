@@ -43,9 +43,9 @@ defmodule Ext.Gql.Resolvers.Base do
     end
   end
 
-  def find(schema, repo \\ nil) do
+  def find(schema, preload \\ [], repo \\ nil) do
     {_app_name, repo} = Ext.Utils.Repo.get_config(repo)
-    fn %{id: id}, _ -> get(schema, id, repo) end
+    fn %{id: id}, _ -> get(schema, id, preload, repo) end
   end
 
   def update(args) when is_map(args) do
@@ -57,7 +57,7 @@ defmodule Ext.Gql.Resolvers.Base do
     {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{id: id, entity: entity_params}, _info ->
-      case get(schema, id, repo) do
+      case get(schema, id, [], repo) do
         {:ok, entity} ->
           entity_params =
             if entity_params[:extra] do
@@ -115,17 +115,17 @@ defmodule Ext.Gql.Resolvers.Base do
     {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{id: id}, _info ->
-      case get(schema, id, repo) do
+      case get(schema, id, [], repo) do
         {:ok, entity} -> repo.delete(entity)
         {:error, message} -> {:error, message}
       end
     end
   end
 
-  def get(schema, id, repo \\ nil) do
+  def get(schema, id, preload \\ [], repo \\ nil) do
     {_, repo} = Ext.Utils.Repo.get_config(repo)
 
-    case schema |> repo.get(id) do
+    case schema |> repo.get(id) |> repo.preload(preload)do
       nil -> {:error, "#{inspect(schema)} id #{id} not found"}
       entity -> {:ok, entity}
     end
