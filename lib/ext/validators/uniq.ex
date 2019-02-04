@@ -14,7 +14,7 @@ defmodule Ext.Validators.Uniq do
     else
       cond do
         schema
-        |> repo.where_not(%{id: form.changes[:id]})
+        |> repo.where(%{id: {"!=", form.changes[:id]}})
         |> repo.exists?(Map.take(form.changes, fields)) ->
           form |> add_error(List.first(fields), message)
 

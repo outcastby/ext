@@ -28,6 +28,7 @@ defmodule Ext.MixProject do
       {:proper_case, "~> 1.0.2"},
       {:jason, "~> 1.0"},
       {:httpoison, "~> 1.4.0"},
+      {:blankable, "~> 0.0.1"},
     ]
   end
 end
