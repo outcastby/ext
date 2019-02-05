@@ -11,6 +11,7 @@ defmodule Ext.Utils.Base do
 
   def to_atom(value) when is_binary(value), do: String.to_atom(value)
   def to_atom(value) when is_nil(value), do: nil
+  def to_atom(value) when is_list(value), do: Enum.map(value, &__MODULE__.to_atom(&1))
   def to_atom(value), do: AtomicMap.convert(value, safe: false)
 
   def atomize_keys(map) do
