@@ -51,6 +51,27 @@ defmodule Ext.Utils.Base do
     end
   end
 
+  def put_in(object, path, value) when length(path) == 1 do
+    key = List.first(path)
+    Map.merge(object, %{key => value})
+  end
+
+  def put_in(object, path, value) do
+    [head | path] = path
+
+    branch =
+      case __MODULE__.get_in(object, [head]) do
+        nil ->
+          object = Kernel.put_in(object, [head], %{})
+          __MODULE__.put_in(__MODULE__.get_in(object, [head]), path, value)
+
+        new_object ->
+          __MODULE__.put_in(new_object, path, value)
+      end
+
+    Map.merge(object, %{head => branch})
+  end
+
   def check_env_variables(env_path \\ ".env.sample") do
     env_content = File.read!(env_path)
 
