@@ -10,9 +10,15 @@ defmodule Ext.Gql.Types.Scalar.DateTime do
     timezone. Standard is ISO_8601. E.g. 2015-01-23T23:50:07Z
     """)
 
-    serialize(&DateTime.to_iso8601/1)
+    serialize(&serialize__datetime/1)
     parse(&parse_datetime/1)
   end
+
+  def serialize__datetime(value) when is_binary(value) do
+    {:ok, datetime, 0} = DateTime.from_iso8601(value)
+    DateTime.to_iso8601(datetime)
+  end
+  def serialize__datetime(value), do: DateTime.to_iso8601(value)
 
   @spec parse_datetime(Absinthe.Blueprint.Input.String.t()) :: {:ok, DateTime.t()} | :error
   @spec parse_datetime(Absinthe.Blueprint.Input.Null.t()) :: {:ok, nil}
