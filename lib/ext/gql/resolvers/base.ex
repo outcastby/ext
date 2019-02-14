@@ -24,7 +24,7 @@ defmodule Ext.Gql.Resolvers.Base do
     fn args, _ ->
       page_limit = args[:limit] || Application.get_env(app_name, :page_limit) || 20
       offset = args[:offset] || 0
-      filter = if args[:filter], do: Ext.Utils.Base.snake_keys(args[:filter]), else: %{}
+      filter = if args[:filter], do: args[:filter], else: %{}
       try do
         entities =
           schema
