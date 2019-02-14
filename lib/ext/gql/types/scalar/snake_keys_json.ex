@@ -5,7 +5,7 @@ defmodule Ext.Gql.Types.Scalar.SnakeKeysJson do
   """
   use Absinthe.Schema.Notation
 
-  scalar :snake_keys_json, name: "Snake Keys Json" do
+  scalar :snake_keys_json, name: "SnakeKeysJson" do
     description("""
     The `Json` scalar type represents arbitrary json string data, represented as UTF-8
     character sequences. The Json type is most often used to represent a free-form
