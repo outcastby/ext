@@ -78,6 +78,10 @@ defmodule Ext.Ecto.Repo do
         [Ext.Utils.Base.to_str(module), id, updated_at |> DateTime.to_string()] |> Enum.join("/")
       end
 
+      def cache_key(query) do
+        from(r in query, select: max(r.updated_at)) |> __MODULE__.one()
+      end
+
       def transaction_repeateble_read! do
         if Mix.env() != :test do
           __MODULE__.query!("set transaction isolation level repeatable read;")
