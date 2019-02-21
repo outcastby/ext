@@ -3,6 +3,11 @@ defmodule Ext.Utils.Date do
     DateTime.utc_now() |> DateTime.truncate(:second)
   end
 
+  def from(str) do
+    {:ok, date, _} = DateTime.from_iso8601(str)
+    date
+  end
+
   @shift_types [:days, :hours, :minutes, :seconds]
   @doc ~S"""
   Convert to Timex.shift params.
@@ -32,8 +37,10 @@ defmodule Ext.Utils.Date do
       floor_value != value ->
         next_type = Enum.at(@shift_types, Enum.find_index(@shift_types, &(&1 == type)) + 1)
         value = shift_value_for_next_type(value, next_type)
-        shift_normalize((unless next_type, do: type, else: next_type), value)
-      true -> [{type, trunc(value)}]
+        shift_normalize(unless(next_type, do: type, else: next_type), value)
+
+      true ->
+        [{type, trunc(value)}]
     end
   end
 
