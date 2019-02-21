@@ -1,8 +1,4 @@
 defmodule Ext.Utils.Date do
-  def now do
-    DateTime.utc_now() |> DateTime.truncate(:second)
-  end
-
   def from(str) do
     {:ok, date, _} = DateTime.from_iso8601(str)
     date
@@ -53,6 +49,10 @@ defmodule Ext.Utils.Date do
       Enum.member?([:minutes, :seconds], type) -> shift * 60
       true -> shift |> Float.floor()
     end
+  end
+
+  def beginning_of_day(date) do
+    Timex.beginning_of_day(date) |> Timex.format!("%FT%H:%M:%S.%f%:z", :strftime) |> Timex.parse!("{ISO:Extended}")
   end
 
   # TODO (denis) Timex.beginning_of_week works incorrectly
