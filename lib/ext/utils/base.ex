@@ -23,6 +23,22 @@ defmodule Ext.Utils.Base do
     end
   end
 
+  def stringify_keys(nil), do: nil
+
+  def stringify_keys(map = %{}) do
+    map
+    |> Enum.map(fn {k, v} ->
+      cond do
+        is_atom(k) -> {Atom.to_string(k), stringify_keys(v)}
+        is_binary(k) -> {k, stringify_keys(v)}
+      end
+    end)
+    |> Enum.into(%{})
+  end
+
+  def stringify_keys([head | rest]), do: [stringify_keys(head) | stringify_keys(rest)]
+  def stringify_keys(not_a_map), do: not_a_map
+
   def snake_keys(map), do: ProperCase.to_snake_case(map)
 
   def to_str(value) when is_atom(value), do: Atom.to_string(value)

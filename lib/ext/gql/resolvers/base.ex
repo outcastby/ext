@@ -63,7 +63,7 @@ defmodule Ext.Gql.Resolvers.Base do
         {:ok, entity} ->
           entity_params =
             if entity_params[:extra] do
-              extra = Map.merge(Ext.Utils.Base.to_atom(entity.extra), entity_params.extra)
+              extra = Map.merge(entity.extra, Ext.Utils.Base.stringify_keys(entity_params.extra))
               Map.merge(entity_params, %{extra: extra})
             else
               entity_params
