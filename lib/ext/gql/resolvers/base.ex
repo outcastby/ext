@@ -61,14 +61,6 @@ defmodule Ext.Gql.Resolvers.Base do
     fn %{id: id, entity: entity_params}, _info ->
       case get(schema, id, [], repo) do
         {:ok, entity} ->
-          entity_params =
-            if entity_params[:extra] do
-              extra = Map.merge(entity.extra, Ext.Utils.Base.stringify_keys(entity_params.extra))
-              Map.merge(entity_params, %{extra: extra})
-            else
-              entity_params
-            end
-
           case valid?(form_module, Map.merge(entity_params, %{id: id})) do
             true -> entity |> schema.changeset(entity_params) |> repo.update()
             form -> send_errors(form)
@@ -92,13 +84,7 @@ defmodule Ext.Gql.Resolvers.Base do
       entity_params =
         if :erlang.function_exported(schema, :default_state, 0) do
           default_state = schema.default_state
-
-          if default_state[:extra] do
-            extra = Map.merge(entity_params.extra, default_state.extra)
-            Map.merge(entity_params, default_state) |> Map.merge(%{extra: extra})
-          else
-            Map.merge(entity_params, default_state)
-          end
+          Map.merge(entity_params, default_state)
         else
           entity_params
         end
