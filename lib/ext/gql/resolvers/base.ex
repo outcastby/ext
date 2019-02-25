@@ -81,14 +81,6 @@ defmodule Ext.Gql.Resolvers.Base do
     {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{entity: entity_params}, _info ->
-      entity_params =
-        if :erlang.function_exported(schema, :default_state, 0) do
-          default_state = schema.default_state
-          Map.merge(entity_params, default_state)
-        else
-          entity_params
-        end
-
       case valid?(form_module, entity_params) do
         true ->
           entity = struct(schema) |> schema.changeset(entity_params) |> repo.insert!()
