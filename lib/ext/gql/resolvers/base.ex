@@ -25,11 +25,13 @@ defmodule Ext.Gql.Resolvers.Base do
       page_limit = args[:limit] || Application.get_env(app_name, :page_limit) || 20
       offset = args[:offset] || 0
       filter = if args[:filter], do: args[:filter], else: %{}
+      order_by = if args[:order], do: Ext.Utils.Base.to_keyword_list(args[:order]), else: [desc: :id]
+
       try do
         entities =
           schema
           |> repo.where(filter)
-          |> repo.order_by(desc: :id)
+          |> repo.order_by(order_by)
           |> Ecto.Query.limit(^page_limit)
           |> Ecto.Query.offset(^offset)
           |> repo.all()
@@ -37,8 +39,8 @@ defmodule Ext.Gql.Resolvers.Base do
 
         {:ok, entities}
       rescue
-        e in Ecto.QueryError-> {:error, e.message}
-        e in Ecto.Query.CastError-> {:error, e.message}
+        e in Ecto.QueryError -> {:error, e.message}
+        e in Ecto.Query.CastError -> {:error, e.message}
       end
     end
   end
@@ -105,6 +107,7 @@ defmodule Ext.Gql.Resolvers.Base do
         true ->
           entity = struct(schema) |> schema.changeset(entity_params) |> repo.insert!()
           {:ok, entity |> repo.reload()}
+
         form ->
           send_errors(form)
       end
@@ -125,7 +128,7 @@ defmodule Ext.Gql.Resolvers.Base do
   def get(schema, id, preload \\ [], repo \\ nil) do
     {_, repo} = Ext.Utils.Repo.get_config(repo)
 
-    case schema |> repo.get(id) |> repo.preload(preload)do
+    case schema |> repo.get(id) |> repo.preload(preload) do
       nil -> {:error, "#{inspect(schema)} id #{id} not found"}
       entity -> {:ok, entity}
     end
@@ -138,6 +141,7 @@ defmodule Ext.Gql.Resolvers.Base do
       form_module ->
         form = form_module.changeset(entity_params)
         if form.valid?, do: true, else: form
+
       true ->
         true
     end

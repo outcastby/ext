@@ -82,4 +82,8 @@ defmodule Ext.Utils.Base do
       unless System.get_env(env), do: Logger.error("Environment variable #{env} does not set")
     end)
   end
+
+  def to_keyword_list(data) do
+    Enum.reduce(data, [], fn {key, value}, acc ->  [{to_atom(key), to_atom(value)} | acc] end)
+  end
 end
