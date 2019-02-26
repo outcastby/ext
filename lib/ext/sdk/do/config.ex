@@ -8,7 +8,11 @@ defmodule Ext.Sdk.Do.Config do
         create_cluster: %{
           type: :post,
           url: "/clusters"
-        }
+        },
+        clusters: %{
+          type: :get,
+          url: "/clusters"
+        },
       }
     }
 end
