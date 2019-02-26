@@ -3,8 +3,8 @@ defmodule Mix.Helper do
   @depends_of_build_commands ["staging", "uat", "prod"]
   @auto_built_branches ["develop", "master", "release", "hotfix"]
 
-  def puts(text, color \\ :green), do: [:black_background, color, inspect(text)] |> IO.ANSI.format() |> IO.puts()
-  def write(text, color \\ :green), do: [:black_background, color, inspect(text)] |> IO.ANSI.format() |> IO.write()
+  def puts(text, color \\ :green), do: [:black_background, color, text] |> IO.ANSI.format() |> IO.puts()
+  def write(text, color \\ :green), do: [:black_background, color, text] |> IO.ANSI.format() |> IO.write()
 
   def lookup_image_name(tag \\ nil), do: "#{settings()[:docker_image]}:#{tag || lookup_image_tag()}"
 
