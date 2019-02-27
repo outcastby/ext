@@ -11,7 +11,14 @@ defmodule Mix.Helper do
   def lookup_image_tag do
     {hash, _} = System.cmd("git", ["rev-parse", "--short", "HEAD"])
 
-    "#{lookup_branch()}-#{hash |> String.trim()}-#{Timex.format!(Timex.now(), "%d%b", :strftime)}"
+    "#{lookup_branch()}-#{String.trim(hash)}-#{lookup_date()}"
+  end
+
+  def lookup_date do
+    {date, _} = System.cmd("git", ["log", "-1", "--format=%at"])
+    date = date |> String.trim() |> String.to_integer()
+    {:ok, datetime} = DateTime.from_unix(date)
+    Timex.format!(datetime, "%d%b", :strftime)
   end
 
   def lookup_branch do
