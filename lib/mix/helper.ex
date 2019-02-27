@@ -11,12 +11,17 @@ defmodule Mix.Helper do
   def lookup_image_tag do
     {hash, _} = System.cmd("git", ["rev-parse", "--short", "HEAD"])
 
-    "v.#{lookup_branch()}-#{hash |> String.trim()}"
+    "#{lookup_branch()}-#{hash |> String.trim()}-#{Timex.format!(Timex.now(), "%d%b", :strftime)}"
   end
 
   def lookup_branch do
     {branch, _} = System.cmd("git", ["symbolic-ref", "--short", "-q", "HEAD"])
-    branch |> String.trim() |> String.replace("/", "_")
+    branch = branch |> String.trim() |> String.replace("/", "_")
+
+    cond do
+      branch == "develop" -> "dev"
+      true -> branch
+    end
   end
 
   def lookup_commands_from_commit_message do

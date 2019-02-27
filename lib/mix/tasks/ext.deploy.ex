@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Ext.Deploy do
 
     Ext.Commands.SendToSlack.call(
       Helper.settings()[:slack_token], Helper.settings()[:slack_channel],
-      ":rocket: :rocket: :rocket: #{env_name} => #{Mix.Project.config()[:app]} => build #{image_tag} =>  DELIVERED :muscle_left_anim: :deda: :muscle_right_anim:"
+      ":rocket: :rocket: :rocket: #{env_name} => #{Mix.Project.config()[:app]} => #{image_tag} =>  DELIVERED :muscle_left_anim: :deda: :muscle_right_anim:"
     )
   end
 end
