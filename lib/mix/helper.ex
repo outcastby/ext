@@ -1,7 +1,7 @@
 defmodule Mix.Helper do
   @available_commands ["build", "staging", "uat", "prod"]
   @depends_of_build_commands ["staging", "uat", "prod"]
-  @auto_built_branches ["develop", "master", "release", "hotfix"]
+  @auto_built_branches ["develop", "dev", "master", "release", "hotfix"]
 
   def puts(text, color \\ :green), do: [:black_background, color, text] |> IO.ANSI.format() |> IO.puts()
   def write(text, color \\ :green), do: [:black_background, color, text] |> IO.ANSI.format() |> IO.write()
