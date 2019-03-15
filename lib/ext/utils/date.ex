@@ -64,4 +64,14 @@ defmodule Ext.Utils.Date do
       true -> beginning_of_week(date)
     end
   end
+
+
+  def date_time_by_time_string(time, date_time \\ DateTime.utc_now()) do
+    beginning_of_day = beginning_of_day(date_time)
+
+    case String.split(time, ":") |> Enum.map(&Ext.Utils.Base.to_int(&1)) do
+      [hours, minutes, seconds] -> Timex.shift(beginning_of_day, hours: hours, minutes: minutes, seconds: seconds)
+      [hours, minutes] -> Timex.shift(beginning_of_day, hours: hours, minutes: minutes)
+    end
+  end
 end
