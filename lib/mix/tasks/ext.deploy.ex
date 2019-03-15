@@ -28,11 +28,17 @@ defmodule Mix.Tasks.Ext.Deploy do
         args
       end
 
+    slack_notification(
+      ":warning: :warning: :warning: #{env_name} => #{Mix.Project.config()[:app]} => #{image_tag} =>  START DEPLOY :no_pedestrians:"
+    )
+
     Ext.Shell.exec(System.find_executable("ansible-playbook"), args, [{:line, 4096}])
 
-    Ext.Commands.SendToSlack.call(
-      Helper.settings()[:slack_token], Helper.settings()[:slack_channel],
+    slack_notification(
       ":rocket: :rocket: :rocket: #{env_name} => #{Mix.Project.config()[:app]} => #{image_tag} =>  DELIVERED :muscle_left_anim: :deda: :muscle_right_anim:"
     )
   end
+
+  defp slack_notification(message),
+    do: Ext.Commands.SendToSlack.call(Helper.settings()[:slack_token], Helper.settings()[:slack_channel], message)
 end
