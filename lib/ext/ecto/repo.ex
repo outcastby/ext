@@ -44,6 +44,11 @@ defmodule Ext.Ecto.Repo do
         end
       end
 
+      defp compose_query({key, [head | tail] = value}, query, type)
+           when is_list(value) and head in [">", ">=", "<", "<=", "=", "!="] do
+        compose_query({key, List.to_tuple(value)}, query, type)
+      end
+
       defp compose_query({key, value}, query, type) when is_list(value) do
         case type do
           "=" -> query |> where([entity], field(entity, ^key) in ^value)
