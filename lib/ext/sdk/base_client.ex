@@ -69,9 +69,9 @@ defmodule Ext.Sdk.BaseClient do
 
         {status, resp} =
           case method do
-            :post -> post(url, prepare_payload(payload, headers), headers, recv_timeout: 20000)
-            :put -> put(url, prepare_payload(payload, headers), headers, recv_timeout: 20000)
-            :get -> get(url, headers, params: payload, recv_timeout: 20000)
+            :post -> post(url, prepare_payload(payload, headers), headers, recv_timeout: 20000, timeout: 20_000)
+            :put -> put(url, prepare_payload(payload, headers), headers, recv_timeout: 20000, timeout: 20_000)
+            :get -> get(url, headers, params: payload, recv_timeout: 20000, timeout: 20_000)
           end
 
         case status do
@@ -88,9 +88,10 @@ defmodule Ext.Sdk.BaseClient do
         end
       end
 
-      def gql(query) do
+      def gql(query, variables \\ nil) do
         Neuron.Config.set(url: config().base_url <> config().gql_path)
-        {:ok, %Neuron.Response{body: body}} = Neuron.query(query)
+        Neuron.Config.set(connection_opts: [recv_timeout: 20000, timeout: 20_000])
+        {:ok, %Neuron.Response{body: body}} = Neuron.query(query, variables)
         {:ok, body["data"]}
       end
 
