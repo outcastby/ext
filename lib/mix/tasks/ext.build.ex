@@ -30,7 +30,7 @@ defmodule Mix.Tasks.Ext.Build do
     cond do
       file ->
         result =
-          ["author", "hash", "message", "last_commit_date", "image_name", "image_build_date"]
+          ["author", "hash", "message", "last_commit_date", "image_name", "image_build_date", "build_author"]
           |> Enum.reduce(%{last_commit: %{}, image: %{}}, fn key, result ->
             value =
               case key do
@@ -47,17 +47,28 @@ defmodule Mix.Tasks.Ext.Build do
                   val |> String.replace(["\n", "'"], "")
 
                 "last_commit_date" ->
-                  {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%ad'"])
-                  val |> String.replace(["\n", "'"], "")
+                  {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%at'"])
+
+                  val
+                  |> String.replace(["\n", "'"], "")
+                  |> String.to_integer()
+                  |> DateTime.from_unix!()
+                  |> Timex.format!("{ANSIC}")
 
                 "image_name" ->
                   image_name
 
                 "image_build_date" ->
                   Timex.format!(Timex.now(), "{ANSIC}")
+
+                "build_author" ->
+                  {val, 0} = System.cmd("whoami")
+                  val |> String.replace(["\n", "'"], "")
               end
 
-            parent = if Enum.member?(["image_name", "image_build_date"], key), do: :image, else: :last_commit
+            parent =
+              if Enum.member?(["image_name", "image_build_date", "build_author"], key), do: :image, else: :last_commit
+
             Map.put(result, parent, Map.put(result[parent], key, value))
           end)
 
