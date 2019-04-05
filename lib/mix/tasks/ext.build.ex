@@ -62,7 +62,7 @@ defmodule Mix.Tasks.Ext.Build do
                   Timex.format!(Timex.now(), "{ANSIC}")
 
                 "build_author" ->
-                  {val, 0} = System.cmd("whoami")
+                  {val, 0} = System.cmd("whoami", [])
                   val |> String.replace(["\n", "'"], "")
               end
 
