@@ -10,8 +10,18 @@ defmodule Mix.Helper do
 
   def lookup_image_tag do
     {hash, _} = System.cmd("git", ["rev-parse", "--short", "HEAD"])
+    branch_name = lookup_branch()
 
-    "#{lookup_branch()}-#{String.trim(hash)}-#{lookup_date()}"
+    cond do
+      branch_name == "master" -> "#{branch_name}-#{tag_version()}"
+      #      branch_name =~ ~r/^release/ -> "#{branch_name}-#{String.trim(hash)}"
+      true -> "#{lookup_branch()}-#{String.trim(hash)}-#{lookup_date()}"
+    end
+  end
+
+  def tag_version do
+    {tag, _} = System.cmd("git", ["describe"])
+    tag |> String.trim()
   end
 
   def lookup_date do
@@ -23,7 +33,7 @@ defmodule Mix.Helper do
 
   def lookup_branch do
     {branch, _} = System.cmd("git", ["symbolic-ref", "--short", "-q", "HEAD"])
-    branch = branch |> String.trim() |> String.replace("/", "_")
+    branch = branch |> String.trim() |> String.replace("/", "-")
 
     cond do
       branch == "develop" -> "dev"
