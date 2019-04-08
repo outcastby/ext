@@ -29,53 +29,54 @@ defmodule Mix.Tasks.Ext.Build do
 
     cond do
       file ->
-        result =
-          ["author", "hash", "message", "last_commit_date", "image_name", "image_build_date", "build_author"]
-          |> Enum.reduce(%{last_commit: %{}, image: %{}}, fn key, result ->
-            value =
-              case key do
-                "author" ->
-                  {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%an <%ae>'"])
-                  val |> String.replace(["\n", "'"], "")
-
-                "hash" ->
-                  {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%H'"])
-                  val |> String.replace(["\n", "'"], "")
-
-                "message" ->
-                  {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%s'"])
-                  val |> String.replace(["\n", "'"], "")
-
-                "last_commit_date" ->
-                  {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%at'"])
-
-                  val
-                  |> String.replace(["\n", "'"], "")
-                  |> String.to_integer()
-                  |> DateTime.from_unix!()
-                  |> Timex.format!("{ANSIC}")
-
-                "image_name" ->
-                  image_name
-
-                "image_build_date" ->
-                  Timex.format!(Timex.now(), "{ANSIC}")
-
-                "build_author" ->
-                  {val, 0} = System.cmd("whoami", [])
-                  val |> String.replace(["\n", "'"], "")
-              end
-
-            parent =
-              if Enum.member?(["image_name", "image_build_date", "build_author"], key), do: :image, else: :last_commit
-
-            Map.put(result, parent, Map.put(result[parent], key, value))
-          end)
+        result = %{
+          image: %{
+            name: image_name,
+            build_date: Timex.format!(Timex.now(), "{ANSIC}"),
+            build_author: build_author()
+          },
+          commit: %{
+            date: commit_date(),
+            message: commit_message(),
+            hash: commit_hash(),
+            author: commit_author()
+          }
+        }
 
         File.write(Application.get_env(Mix.Project.config()[:app], :ext)[:build_info_file_name], Poison.encode!(result))
 
       true ->
         nil
     end
+  end
+
+  def build_author do
+    {val, 0} = System.cmd("whoami", [])
+    val |> String.replace(["\n", "'"], "")
+  end
+
+  def commit_author do
+    {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%an <%ae>'"])
+    val |> String.replace(["\n", "'"], "")
+  end
+
+  def commit_hash do
+    {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%h'"])
+    val |> String.replace(["\n", "'"], "")
+  end
+
+  def commit_message do
+    {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%s'"])
+    val |> String.replace(["\n", "'"], "")
+  end
+
+  def commit_date do
+    {val, 0} = System.cmd("git", ["--no-pager", "show", "-s", "--format='%at'"])
+
+    val
+    |> String.replace(["\n", "'"], "")
+    |> String.to_integer()
+    |> DateTime.from_unix!()
+    |> Timex.format!("{ANSIC}")
   end
 end
