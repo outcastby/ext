@@ -20,7 +20,7 @@ defmodule Mix.Helper do
   end
 
   def tag_version do
-    {tag, _} = System.cmd("git", ["describe"])
+    {tag, _} = System.cmd("git", ["describe", "--abbrev=0", "--tags"])
     tag |> String.trim()
   end
 
