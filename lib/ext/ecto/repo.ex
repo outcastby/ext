@@ -35,17 +35,32 @@ defmodule Ext.Ecto.Repo do
 
       defp compose_query({key, value}, query, _type) when is_tuple(value) do
         case value do
-          {">", value} -> query |> where([entity], field(entity, ^key) > ^value)
-          {">=", value} -> query |> where([entity], field(entity, ^key) >= ^value)
-          {"<", value} -> query |> where([entity], field(entity, ^key) < ^value)
-          {"<=", value} -> query |> where([entity], field(entity, ^key) <= ^value)
-          {"=", value} -> compose_query({key, value}, query, "=")
-          {"!=", value} -> compose_query({key, value}, query, "!=")
+          {">", value} ->
+            query |> where([entity], field(entity, ^key) > ^value)
+
+          {">=", value} ->
+            query |> where([entity], field(entity, ^key) >= ^value)
+
+          {"<", value} ->
+            query |> where([entity], field(entity, ^key) < ^value)
+
+          {"<=", value} ->
+            query |> where([entity], field(entity, ^key) <= ^value)
+
+          {"=", value} ->
+            compose_query({key, value}, query, "=")
+
+          {"!=", value} ->
+            compose_query({key, value}, query, "!=")
+
+          {"~=", value} ->
+            query
+            |> where([entity], like(fragment("lower(?)", field(entity, ^key)), fragment("lower(?)", ^"%#{value}%")))
         end
       end
 
       defp compose_query({key, [head | tail] = value}, query, type)
-           when is_list(value) and head in [">", ">=", "<", "<=", "=", "!="] do
+           when is_list(value) and head in [">", ">=", "<", "<=", "=", "!=", "~="] do
         compose_query({key, List.to_tuple(value)}, query, type)
       end
 
