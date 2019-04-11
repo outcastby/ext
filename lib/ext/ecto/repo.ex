@@ -85,7 +85,7 @@ defmodule Ext.Ecto.Repo do
         end
       end
 
-      def batch_insert(schema_or_source, entries, batch, opts \\ []) do
+      def batch_insert(schema_or_source, entries, batch \\ 5_000, opts \\ []) do
         Enum.each(
           Enum.chunk_every(entries, batch),
           &Ecto.Repo.Schema.insert_all(__MODULE__, schema_or_source, &1, opts)
