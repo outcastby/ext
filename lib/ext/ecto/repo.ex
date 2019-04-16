@@ -23,6 +23,22 @@ defmodule Ext.Ecto.Repo do
         query |> Ecto.Query.limit(1) |> one()
       end
 
+      def where(query, {:or, params}) do
+        previous_query = query
+        params
+        |> Enum.with_index()
+        |> Enum.reduce(query, fn {expression, index}, query ->
+          new_query = Enum.reduce(Ext.Utils.Base.atomize_keys(expression), previous_query, &compose_query/2)
+
+          if index == 0, do: query, else: :or
+
+          case index do
+            0 -> new_query
+            _ -> query |> union(^new_query)
+          end
+        end)
+      end
+
       def where(query, params) do
         Enum.reduce(Ext.Utils.Base.atomize_keys(params), query, &compose_query/2)
       end
