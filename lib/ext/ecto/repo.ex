@@ -27,11 +27,11 @@ defmodule Ext.Ecto.Repo do
         Enum.reduce(conditions, query, &__MODULE__.or_where(&2, &1))
       end
 
-      def where(query, params), do: Ecto.Query.where(query, ^build_conditions(query, params))
-      def or_where(query, params), do: Ecto.Query.or_where(query, ^build_conditions(query, params))
+      def where(query, params), do: Ecto.Query.where(query, ^build_conditions(params))
+      def or_where(query, params), do: Ecto.Query.or_where(query, ^build_conditions(params))
 
-      def build_conditions(query, params) do
-        Enum.reduce(Ext.Utils.Base.atomize_keys(params), nil, &Ext.Ecto.ComposeQuery.call(&1, &2, %{type: "="}))
+      def build_conditions(params) do
+        Enum.reduce(Ext.Utils.Base.atomize_keys(params), nil, &Ext.Ecto.ComposeQuery.call(&1, &2, %{type: "="})) || true
       end
 
       def batch_insert(schema_or_source, entries, batch \\ 5_000, opts \\ []) do
