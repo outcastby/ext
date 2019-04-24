@@ -23,66 +23,15 @@ defmodule Ext.Ecto.Repo do
         query |> Ecto.Query.limit(1) |> one()
       end
 
-      def where(query, params) do
-        Enum.reduce(Ext.Utils.Base.atomize_keys(params), query, &compose_query/2)
+      def where(query, {:or, conditions}) when is_list(conditions) do
+        Enum.reduce(conditions, query, &__MODULE__.or_where(&2, &1))
       end
 
-      defp compose_query(params, query, type \\ "=")
+      def where(query, params), do: Ecto.Query.where(query, ^build_conditions(query, params))
+      def or_where(query, params), do: Ecto.Query.or_where(query, ^build_conditions(query, params))
 
-      defp compose_query({key, value}, query, type) when is_map(value) do
-        compose_query({key, {value[:type] || value["type"], value["value"] || value[:value]}}, query, type)
-      end
-
-      defp compose_query({key, value}, query, _type) when is_tuple(value) do
-        case value do
-          {">", value} ->
-            query |> where([entity], field(entity, ^key) > ^value)
-
-          {">=", value} ->
-            query |> where([entity], field(entity, ^key) >= ^value)
-
-          {"<", value} ->
-            query |> where([entity], field(entity, ^key) < ^value)
-
-          {"<=", value} ->
-            query |> where([entity], field(entity, ^key) <= ^value)
-
-          {"=", value} ->
-            compose_query({key, value}, query, "=")
-
-          {"!=", value} ->
-            compose_query({key, value}, query, "!=")
-
-          {"~=", value} ->
-            query
-            |> where([entity], like(fragment("lower(?)", field(entity, ^key)), fragment("lower(?)", ^"%#{value}%")))
-        end
-      end
-
-      defp compose_query({key, [head | tail] = value}, query, type)
-           when is_list(value) and head in [">", ">=", "<", "<=", "=", "!=", "~="] do
-        compose_query({key, List.to_tuple(value)}, query, type)
-      end
-
-      defp compose_query({key, value}, query, type) when is_list(value) do
-        case type do
-          "=" -> query |> where([entity], field(entity, ^key) in ^value)
-          "!=" -> query |> where([entity], field(entity, ^key) not in ^value)
-        end
-      end
-
-      defp compose_query({key, nil}, query, type) do
-        case type do
-          "=" -> query |> where([entity], is_nil(field(entity, ^key)))
-          "!=" -> query |> where([entity], not is_nil(field(entity, ^key)))
-        end
-      end
-
-      defp compose_query({key, value}, query, type) do
-        case type do
-          "=" -> query |> where([entity], ^[{key, value}])
-          "!=" -> query |> where([entity], field(entity, ^key) != ^value)
-        end
+      def build_conditions(query, params) do
+        Enum.reduce(Ext.Utils.Base.atomize_keys(params), nil, &Ext.Ecto.ComposeQuery.call(&1, &2, %{type: "="}))
       end
 
       def batch_insert(schema_or_source, entries, batch \\ 5_000, opts \\ []) do
