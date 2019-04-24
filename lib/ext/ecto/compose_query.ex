@@ -1,6 +1,5 @@
 defmodule Ext.Ecto.ComposeQuery do
   import Ecto.Query
-  import IEx
 
   @doc """
     iex> where(query, %{position: %{sign: ">", value: 1}})
