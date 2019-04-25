@@ -59,7 +59,9 @@ defmodule Ext.Gql.Resolvers.Base do
     {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{id: id, entity: entity_params}, _info ->
-      case get(schema, id, [], repo) do
+      {entity_params, preload_assoc} = build_assoc_data(schema, repo, entity_params)
+
+      case get(schema, id, preload_assoc, repo) do
         {:ok, entity} ->
           case valid?(form_module, Map.merge(entity_params, %{id: id})) do
             true -> entity |> schema.changeset(entity_params) |> repo.update()
@@ -81,6 +83,7 @@ defmodule Ext.Gql.Resolvers.Base do
     {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{entity: entity_params}, _info ->
+      {entity_params, _} = build_assoc_data(schema, repo, entity_params)
       case valid?(form_module, entity_params) do
         true ->
           entity = struct(schema) |> schema.changeset(entity_params) |> repo.insert!()
@@ -122,6 +125,26 @@ defmodule Ext.Gql.Resolvers.Base do
 
       true ->
         true
+    end
+  end
+
+  def build_assoc_data(schema, repo, entity_params) do
+    Enum.reduce(entity_params, {entity_params, []}, fn {k, v}, {entity_params, preload_assoc} ->
+      assoc_schema = get_assoc_schema(schema, k)
+
+      if is_list(v) && assoc_schema do
+        assoc_entities = assoc_schema |> repo.where(id: v) |> repo.all()
+        {Map.merge(entity_params, %{k => assoc_entities}), preload_assoc ++ [k]}
+      else
+        {entity_params, preload_assoc}
+      end
+    end)
+  end
+
+  def get_assoc_schema(schema, key) do
+    case schema.__changeset__[key] do
+      {:assoc, %{queryable: queryable}} -> queryable
+      _ -> nil
     end
   end
 end

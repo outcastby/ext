@@ -7,6 +7,8 @@ defmodule Mix.Helper do
   def write(text, color \\ :green), do: [:black_background, color, text] |> IO.ANSI.format() |> IO.write()
 
   def lookup_image_repository(), do: settings()[:docker_image]
+  def lookup_docker_hub_user(), do: settings()[:docker_hub_user]
+  def lookup_docker_hub_pass(), do: settings()[:docker_hub_pass]
   def lookup_image_name(tag \\ nil), do: "#{lookup_image_repository()}:#{tag || lookup_image_tag()}"
 
   def lookup_image_tag do
