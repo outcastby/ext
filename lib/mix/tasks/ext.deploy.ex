@@ -18,6 +18,8 @@ defmodule Mix.Tasks.Ext.Deploy do
     HTTPoison.start()
     Helper.puts("Deploy service #{Mix.Project.config()[:app]}. Environment=#{env_name}. Image=#{image_tag}")
 
+    find_or_create_build(image_tag)
+
     args = ["-i", "inventory", "playbook.yml", "--extra-vars", "env_name=#{env_name} image_tag=#{image_tag}"]
 
     args =
@@ -41,4 +43,25 @@ defmodule Mix.Tasks.Ext.Deploy do
 
   defp slack_notification(message),
     do: Ext.Commands.SendToSlack.call(Helper.settings()[:slack_token], Helper.settings()[:slack_channel], message)
+
+  def find_or_create_build(image_tag) do
+    repository = Helper.lookup_image_repository()
+    Helper.puts("Check if build exist #{Mix.Project.config()[:app]}. Repository=#{repository} ImageTag=#{image_tag}")
+
+    # curl --silent -f -lSL https://hub.docker.com/v2/repositories/planetgr/arcade/tags/dev-e18c9da-23Apr
+    {_, status} =
+      System.cmd(System.find_executable("curl"), [
+        "pull",
+        "--silent",
+        "-f",
+        "-lSL",
+        "https://hub.docker.com/v2/repositories/#{repository}/tags/#{image_tag}"
+      ])
+
+    if status == 0 do
+      Helper.puts("Exist ImageTag=#{image_tag}")
+    else
+      Mix.Tasks.Ext.Build.run([image_tag])
+    end
+  end
 end

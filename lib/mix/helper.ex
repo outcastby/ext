@@ -6,7 +6,8 @@ defmodule Mix.Helper do
   def puts(text, color \\ :green), do: [:black_background, color, text] |> IO.ANSI.format() |> IO.puts()
   def write(text, color \\ :green), do: [:black_background, color, text] |> IO.ANSI.format() |> IO.write()
 
-  def lookup_image_name(tag \\ nil), do: "#{settings()[:docker_image]}:#{tag || lookup_image_tag()}"
+  def lookup_image_repository(), do: settings()[:docker_image]
+  def lookup_image_name(tag \\ nil), do: "#{lookup_image_repository()}:#{tag || lookup_image_tag()}"
 
   def lookup_image_tag do
     {hash, _} = System.cmd("git", ["rev-parse", "--short", "HEAD"])
