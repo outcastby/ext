@@ -57,7 +57,7 @@ defmodule Mix.Tasks.Ext.Deploy do
       "-lSL",
       "-H",
       "Authorization: JWT #{token}",
-      "https://hub.docker.com/v2/repositories/planetgr/gold-rush-app/tags/#{image_tag}"
+      "https://hub.docker.com/v2/repositories/#{repository}/tags/#{image_tag}"
     ]
 
     {_, status} = System.cmd(System.find_executable("curl"), args)
