@@ -23,8 +23,8 @@ defmodule Mix.Helper do
   end
 
   def tag_version do
-    {tag, _} = System.cmd("git", ["describe", "--abbrev=0", "--tags"])
-    tag |> String.trim()
+    {tags, _} = System.cmd("git", ["tag", "-l", "--sort=v:refname"])
+    tags |> String.trim() |> String.split("\n") |> List.last()
   end
 
   def lookup_date do
