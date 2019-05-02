@@ -103,4 +103,10 @@ defmodule Ext.Utils.Base do
   def to_keyword_list(data) do
     Enum.reduce(data, [], fn {key, value}, acc ->  [{to_atom(key), to_atom(value)} | acc] end)
   end
+
+  def to_existing_atom(string) do
+    String.to_existing_atom(string)
+  rescue
+    ArgumentError -> nil
+  end
 end
