@@ -23,12 +23,18 @@ defmodule Ext.Ecto.Repo do
         query |> Ecto.Query.limit(1) |> one()
       end
 
-      def where(query, {:or, conditions}) when is_list(conditions) do
-        Enum.reduce(conditions, query, &__MODULE__.or_where(&2, &1))
+      def where(query, {:or, conditions}) when is_list(conditions),
+        do: Ecto.Query.where(query, ^build_or_dynamic(conditions))
+
+      def build_or_dynamic(conditions) do
+        Enum.reduce(conditions, nil, fn params, dynamic ->
+          if dynamic,
+            do: Ecto.Query.dynamic([e], ^build_conditions(params) or ^dynamic),
+            else: Ecto.Query.dynamic([e], ^build_conditions(params))
+        end)
       end
 
       def where(query, params), do: Ecto.Query.where(query, ^build_conditions(params))
-      def or_where(query, params), do: Ecto.Query.or_where(query, ^build_conditions(params))
 
       def build_conditions(params) do
         Enum.reduce(Ext.Utils.Base.atomize_keys(params), nil, &Ext.Ecto.ComposeQuery.call(&1, &2, %{type: "="})) || true
