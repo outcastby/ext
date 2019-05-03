@@ -14,8 +14,17 @@ defmodule Ext.Utils.Base do
   def to_atom(value) when is_list(value), do: Enum.map(value, &__MODULE__.to_atom(&1))
   def to_atom(value), do: AtomicMap.convert(value, safe: false)
 
-  def atomize_keys(map) do
+  def atomize_keys(map) when is_map(map) do
     for {key, val} <- map, into: %{} do
+      cond do
+        is_atom(key) -> {key, val}
+        true -> {String.to_atom(key), val}
+      end
+    end
+  end
+
+  def atomize_keys(map) do
+    for {key, val} <- map, into: [] do
       cond do
         is_atom(key) -> {key, val}
         true -> {String.to_atom(key), val}
