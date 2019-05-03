@@ -62,6 +62,17 @@ defmodule Ext.Ecto.Repo do
       def reload(%module{id: id}) do
         get(module, id)
       end
+
+      def save(schema, data) do
+        schema
+        |> schema.__struct__.changeset(data)
+        |> __MODULE__.insert()
+      end
+
+      def save!(schema, data) do
+        {:ok, entity} = save(schema, data)
+        entity
+      end
     end
   end
 end
