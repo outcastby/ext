@@ -1,6 +1,7 @@
 defmodule Mix.Tasks.Ext.Deploy do
   use Mix.Task
   alias Mix.Helper
+  alias Mix.Commands.Deploy
 
   def run([env_name] = args) when length(args) == 1 do
     run([env_name, Helper.lookup_image_tag(), false])
@@ -18,71 +19,17 @@ defmodule Mix.Tasks.Ext.Deploy do
     HTTPoison.start()
     Helper.puts("Deploy service #{Mix.Project.config()[:app]}. Environment=#{env_name}. Image=#{image_tag}")
 
-    find_or_create_build(image_tag)
+    env_name
+    |> Deploy.Context.init(image_tag)
+    |> Deploy.BuildArgs.call(is_fast)
+    |> Deploy.FindOrCreateBuild.call()
+    |> SendSlackNotification.call(:before)
+    |> exec_shell()
+    |> SendSlackNotification.call(:after)
+  end
 
-    args = ["-i", "inventory", "playbook.yml", "--extra-vars", "env_name=#{env_name} image_tag=#{image_tag}"]
-
-    args =
-      if is_fast do
-        Helper.puts("Job is skipped")
-        args ++ ["--skip-tags", "job"]
-      else
-        args
-      end
-
-    slack_notification(
-      ":warning: :warning: :warning: #{env_name} => #{Mix.Project.config()[:app]} => #{image_tag} =>  START DEPLOY :no_pedestrians:"
-    )
-
+  defp exec_shell(%{args: args} = context) do
     Ext.Shell.exec(System.find_executable("ansible-playbook"), args, [{:line, 4096}])
-
-    slack_notification(
-      ":rocket: :rocket: :rocket: #{env_name} => #{Mix.Project.config()[:app]} => #{image_tag} =>  DELIVERED :muscle_left_anim: :deda: :muscle_right_anim:"
-    )
-  end
-
-  defp slack_notification(message),
-    do: Ext.Commands.SendToSlack.call(Helper.settings()[:slack_token], Helper.settings()[:slack_channel], message)
-
-  def find_or_create_build(image_tag) do
-    repository = Helper.lookup_image_repository()
-    token = get_docker_hub_token()
-    Helper.puts("Check if build exist #{Mix.Project.config()[:app]}. Repository=#{repository} ImageTag=#{image_tag}")
-
-    # curl --silent -f -lSL https://hub.docker.com/v2/repositories/planetgr/arcade/tags/dev-e18c9da-23Apr
-    args = [
-      "pull",
-      "--silent",
-      "-f",
-      "-lSL",
-      "-H",
-      "Authorization: JWT #{token}",
-      "https://hub.docker.com/v2/repositories/#{repository}/tags/#{image_tag}"
-    ]
-
-    {_, status} = System.cmd(System.find_executable("curl"), args)
-
-    if status == 0 do
-      Helper.puts("Exist ImageTag=#{image_tag}")
-    else
-      Mix.Tasks.Ext.Build.run([image_tag])
-    end
-  end
-
-  def get_docker_hub_token() do
-    # curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'${UNAME}'", "password": "'${UPASS}'"}' https://hub.docker.com/v2/users/login/
-    args = [
-      "-s",
-      "-H",
-      "Content-Type: application/json",
-      "-X",
-      "POST",
-      "-d",
-      "{\"username\": \"#{Helper.lookup_docker_hub_user()}\", \"password\": \"#{Helper.lookup_docker_hub_pass()}\"}",
-      "https://hub.docker.com/v2/users/login/"
-    ]
-
-    {message, status} = System.cmd(System.find_executable("curl"), args)
-    if status == 0, do: Poison.decode!(message)["token"], else: ""
+    context
   end
 end
