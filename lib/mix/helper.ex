@@ -27,6 +27,13 @@ defmodule Mix.Helper do
     tags |> String.trim() |> String.split("\n") |> List.last()
   end
 
+  def parse_tag_version(image) do
+    case Regex.run(~r/v\d\.\d/, image) do
+      nil -> nil
+      value -> value |> List.first()
+    end
+  end
+
   def lookup_date do
     {date, _} = System.cmd("git", ["log", "-1", "--format=%at"])
     date = date |> String.trim() |> String.to_integer()
