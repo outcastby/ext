@@ -64,14 +64,17 @@ defmodule Ext.Ecto.Repo do
       end
 
       def save(schema, data) do
-        schema
-        |> schema.__struct__.changeset(data)
-        |> __MODULE__.insert()
+        case schema.__meta__.state do
+          :built -> schema |> schema.__struct__.changeset(data) |> __MODULE__.insert()
+          :loaded -> schema |> schema.__struct__.changeset(data) |> __MODULE__.update()
+        end
       end
 
       def save!(schema, data) do
-        {:ok, entity} = save(schema, data)
-        entity
+        case schema.__meta__.state do
+          :built -> schema |> schema.__struct__.changeset(data) |> __MODULE__.insert!()
+          :loaded -> schema |> schema.__struct__.changeset(data) |> __MODULE__.update!()
+        end
       end
     end
   end
