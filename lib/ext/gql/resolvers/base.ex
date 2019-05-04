@@ -84,6 +84,7 @@ defmodule Ext.Gql.Resolvers.Base do
 
     fn %{entity: entity_params}, _info ->
       {entity_params, _} = build_assoc_data(schema, repo, entity_params)
+
       case valid?(form_module, entity_params) do
         true ->
           entity = struct(schema) |> schema.changeset(entity_params) |> repo.insert!()
