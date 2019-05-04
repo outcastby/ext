@@ -65,7 +65,6 @@ defmodule Ext.Utils.Date do
     end
   end
 
-
   def date_time_by_time_string(time, date_time \\ DateTime.utc_now()) do
     beginning_of_day = beginning_of_day(date_time)
 

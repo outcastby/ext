@@ -5,7 +5,7 @@ defmodule Ext.Forms.Base do
     quote do
       schema unquote(name) do
         unquote(fields)
-        field :context, :map, default: %{}
+        field(:context, :map, default: %{})
       end
     end
   end

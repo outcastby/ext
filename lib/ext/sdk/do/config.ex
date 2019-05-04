@@ -12,7 +12,7 @@ defmodule Ext.Sdk.Do.Config do
         clusters: %{
           type: :get,
           url: "/clusters"
-        },
+        }
       }
     }
 end

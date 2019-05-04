@@ -18,6 +18,7 @@ defmodule Ext.Gql.Types.Scalar.DateTime do
     {:ok, datetime, 0} = DateTime.from_iso8601(value)
     DateTime.to_iso8601(datetime)
   end
+
   def serialize__datetime(value), do: DateTime.to_iso8601(value)
 
   @spec parse_datetime(Absinthe.Blueprint.Input.String.t()) :: {:ok, DateTime.t()} | :error

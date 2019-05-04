@@ -7,6 +7,7 @@ defmodule Ext.Sdk.Do.Client do
     if !Ext.Sdk.Do.Config.data().access_token do
       raise "ENV DO_ACCESS_TOKEN should be filled"
     end
+
     [Authorization: "Bearer " <> Ext.Sdk.Do.Config.data().access_token] ++ headers
   end
 end

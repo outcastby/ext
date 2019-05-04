@@ -18,28 +18,21 @@ defmodule Mix.Commands.Deploy.BuildArgs do
       |> skip_release_tag(context)
       |> skip_job_tag(is_fast)
 
-    Deploy.Context.update(context, %{args: args})
+    %{context | args: args}
   end
 
-  def skip_release_tag(args, %{version: version, prev_version: prev_version, env_name: env_name} = context) do
-    cond do
-      version == prev_version || env_name != "prod" ->
-        Helper.puts("Tag release is skipped")
-        args ++ ["--skip-tags", "release"]
-
-      true ->
-        args
-    end
+  def skip_release_tag(args, %{version: version, prev_version: prev_version, env_name: env_name})
+      when version == prev_version or env_name != "prod" do
+    Helper.puts("Tag release is skipped")
+    args ++ ["--skip-tags", "release"]
   end
 
-  def skip_job_tag(args, is_fast) do
-    cond do
-      is_fast ->
-        Helper.puts("Job is skipped")
-        args ++ ["--skip-tags", "job"]
+  def skip_release_tag(args, _), do: args
 
-      true ->
-        args
-    end
+  def skip_job_tag(args, true) do
+    Helper.puts("Job is skipped")
+    args ++ ["--skip-tags", "job"]
   end
+
+  def skip_job_tag(args, _), do: args
 end

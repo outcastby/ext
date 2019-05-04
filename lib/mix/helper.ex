@@ -30,7 +30,7 @@ defmodule Mix.Helper do
   def parse_tag_version(image) do
     case Regex.run(~r/v\d\.\d/, image) do
       nil -> nil
-      value -> value |> List.first()
+      [value] -> value
     end
   end
 

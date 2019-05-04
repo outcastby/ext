@@ -23,9 +23,9 @@ defmodule Mix.Tasks.Ext.Deploy do
     |> Deploy.Context.init(image_tag)
     |> Deploy.BuildArgs.call(is_fast)
     |> Deploy.FindOrCreateBuild.call()
-    |> SendSlackNotification.call(:before)
+    |> Deploy.SendSlackNotification.call(:before)
     |> exec_shell()
-    |> SendSlackNotification.call(:after)
+    |> Deploy.SendSlackNotification.call(:after)
   end
 
   defp exec_shell(%{args: args} = context) do
