@@ -11,10 +11,8 @@ defmodule Mix.Tasks.Ext.Destroy do
       "inventory",
       "playbook_destroy.yml",
       "--extra-vars",
-      "env_name=#{env_name} image_tag=#{image_tag} version=#{Helper.parse_tag_version(image_tag)}",
+      "env_name=#{env_name} image_tag=#{image_tag} version=#{Helper.parse_tag_version(image_tag)}"
     ]
-    
-    args = if env_name != "prod", do: args ++ ["--skip-tags", "only_prod"], else: args
 
     Ext.Shell.exec(System.find_executable("ansible-playbook"), args, [{:line, 4096}])
   end
