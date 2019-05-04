@@ -11,8 +11,6 @@ defmodule Mix.Commands.Deploy.Context do
     %__MODULE__{version: version, prev_version: prev_version, tag: tag, prev_tag: prev_tag, env_name: env_name}
   end
 
-  def deploy_version(image), do: Helper.parse_tag_version(image)
-
   def current_server_state(env_name) do
     # curl https://arcade.prod.server-planet-gold-rush.com/info
     args = [String.replace(Helper.settings()[:build_info_path], ":env_name:", env_name)]
