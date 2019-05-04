@@ -42,6 +42,9 @@ defmodule Mix.Commands.Deploy.FindOrCreateBuild do
     ]
 
     {message, status} = System.cmd(System.find_executable("curl"), args)
-    if status == 0, do: Poison.decode!(message)["token"], else: ""
+    case System.cmd(System.find_executable("curl"), args) do
+      {message, 0} -> Jason.decode!(message)["token"]
+      _ -> ""
+    end
   end
 end
