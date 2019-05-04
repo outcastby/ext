@@ -17,12 +17,9 @@ defmodule Mix.Commands.Deploy.FindOrCreateBuild do
       "https://hub.docker.com/v2/repositories/#{repository}/tags/#{tag}"
     ]
 
-    {_, status} = System.cmd(System.find_executable("curl"), args)
-
-    if status == 0 do
-      Helper.puts("Exist ImageTag=#{tag}")
-    else
-      Mix.Tasks.Ext.Build.run([tag])
+    case System.cmd(System.find_executable("curl"), args) do
+      {_, 0} -> Helper.puts("Exist ImageTag=#{tag}")
+      _ -> Mix.Tasks.Ext.Build.run([tag])
     end
 
     context
@@ -41,7 +38,6 @@ defmodule Mix.Commands.Deploy.FindOrCreateBuild do
       "https://hub.docker.com/v2/users/login/"
     ]
 
-    {message, status} = System.cmd(System.find_executable("curl"), args)
     case System.cmd(System.find_executable("curl"), args) do
       {message, 0} -> Jason.decode!(message)["token"]
       _ -> ""

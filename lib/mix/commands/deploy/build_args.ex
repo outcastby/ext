@@ -1,6 +1,6 @@
 defmodule Mix.Commands.Deploy.BuildArgs do
-  alias Mix.Commands.Deploy
   alias Mix.Helper
+  require IEx
 
   def call(context, is_fast) do
     %{version: version, prev_version: prev_version, tag: tag, prev_tag: prev_tag, env_name: env_name} = context
@@ -31,7 +31,11 @@ defmodule Mix.Commands.Deploy.BuildArgs do
 
   def skip_job_tag(args, true) do
     Helper.puts("Job is skipped")
-    args ++ ["--skip-tags", "job"]
+
+    case Enum.find_index(args, &(&1 == "--skip-tags")) do
+      nil -> args ++ ["--skip-tags", "job"]
+      index -> List.replace_at(args, index + 1, "#{Enum.at(args, index + 1)},job")
+    end
   end
 
   def skip_job_tag(args, _), do: args

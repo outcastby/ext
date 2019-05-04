@@ -31,7 +31,8 @@ defmodule Ext.MixProject do
       {:blankable, "~> 0.0.1"},
       {:neuron, "~> 1.0.0"},
       {:postgrex, ">= 0.0.0-rc"},
-      {:plug_cowboy, "~> 2.0"}
+      {:plug_cowboy, "~> 2.0"},
+      {:mock, "0.3.3", only: :test}
     ]
   end
 end
