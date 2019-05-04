@@ -1,15 +1,17 @@
 defmodule Mix.Commands.Deploy.Context do
   alias Mix.Helper
+  require IEx
+
   defstruct [:env_name, :tag, :version, :prev_tag, :prev_version, args: []]
 
-  def init("prod", tag), do: %__MODULE__{tag: tag, env_name: "prod"}
-
-  def init(env_name, tag) do
+  def init("prod", tag) do
     version = Helper.parse_tag_version(tag)
-    {prev_version, prev_tag} = current_server_state(env_name)
+    {prev_version, prev_tag} = current_server_state("prod")
 
-    %__MODULE__{version: version, prev_version: prev_version, tag: tag, prev_tag: prev_tag, env_name: env_name}
+    %__MODULE__{version: version, prev_version: prev_version, tag: tag, prev_tag: prev_tag, env_name: "prod"}
   end
+
+  def init(env_name, tag), do: %__MODULE__{tag: tag, env_name: env_name}
 
   def current_server_state(env_name) do
     # curl https://arcade.prod.server-planet-gold-rush.com/info

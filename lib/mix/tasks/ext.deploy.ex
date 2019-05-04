@@ -15,6 +15,10 @@ defmodule Mix.Tasks.Ext.Deploy do
     run([env_name, image_tag, false])
   end
 
+  def run([env_name, image_tag, "-f"]) do
+    run([env_name, image_tag, true])
+  end
+
   def run([env_name, image_tag, is_fast]) do
     HTTPoison.start()
     Helper.puts("Deploy service #{Mix.Project.config()[:app]}. Environment=#{env_name}. Image=#{image_tag}")
