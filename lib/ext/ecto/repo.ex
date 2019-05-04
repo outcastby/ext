@@ -69,19 +69,17 @@ defmodule Ext.Ecto.Repo do
         get(module, id)
       end
 
-      def save(schema, data) do
-        case schema.__meta__.state do
-          :built -> schema |> schema.__struct__.changeset(data) |> __MODULE__.insert()
-          :loaded -> schema |> schema.__struct__.changeset(data) |> __MODULE__.update()
-        end
-      end
+      def save(%{__meta__: %{state: :built}} = schema, data),
+        do: schema |> schema.__struct__.changeset(data) |> __MODULE__.insert()
 
-      def save!(schema, data) do
-        case schema.__meta__.state do
-          :built -> schema |> schema.__struct__.changeset(data) |> __MODULE__.insert!()
-          :loaded -> schema |> schema.__struct__.changeset(data) |> __MODULE__.update!()
-        end
-      end
+      def save(%{__meta__: %{state: :loaded}} = schema, data),
+        do: schema |> schema.__struct__.changeset(data) |> __MODULE__.update()
+
+      def save!(%{__meta__: %{state: :built}} = schema, data),
+        do: schema |> schema.__struct__.changeset(data) |> __MODULE__.insert!()
+
+      def save!(%{__meta__: %{state: :loaded}} = schema, data),
+        do: schema |> schema.__struct__.changeset(data) |> __MODULE__.update!()
     end
   end
 end
