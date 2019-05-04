@@ -20,7 +20,7 @@ defmodule Mix.Commands.Deploy.Context do
     case System.cmd(System.find_executable("curl"), args) do
       {message, 0} ->
         image = Jason.decode!(message)["image"]["name"]
-        {Helper.parse_tag_version(image), image}
+        {Helper.parse_tag_version(image), image |> String.split(":") |> List.last()}
 
       _ ->
         {nil, nil}
