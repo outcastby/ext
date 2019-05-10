@@ -32,6 +32,7 @@ defmodule Ext.MixProject do
       {:neuron, "~> 1.0.0"},
       {:postgrex, ">= 0.0.0-rc"},
       {:plug_cowboy, "~> 2.0"},
+      {:logger_file_backend, "~> 0.0.10"},
       {:mock, "0.3.3", only: :test}
     ]
   end
