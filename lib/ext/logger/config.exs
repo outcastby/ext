@@ -24,25 +24,25 @@ file_backends =
   end
 
 config :logger,
-  format: "$date $time [$level] $message\n",
+  format: "$date $time $metadata[$level] $message\n",
   backends: [:console, {Ext.Logger.Rollbar.ErrorSend, :error_log}] ++ file_backends
 
 config :logger, :error_log,
   path: "log/error.log",
-  format: "$date $time [$level] $message\n",
+  format: "$date $time $metadata[$level] $message\n",
   level: :error
 
 config :logger, :warn_log,
   path: "log/warn.log",
-  format: "$date $time [$level] $message\n",
+  format: "$date $time $metadata[$level] $message\n",
   level: :warn
 
 config :logger, :info_log,
   path: "log/info.log",
-  format: "$date $time [$level] $message\n",
+  format: "$date $time $metadata[$level] $message\n",
   level: :info
 
 config :logger, :debug_log,
   path: "log/debug.log",
-  format: "$date $time [$level] $message\n",
+  format: "$date $time $metadata[$level] $message\n",
   level: :debug
