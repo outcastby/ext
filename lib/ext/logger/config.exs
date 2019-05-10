@@ -30,19 +30,23 @@ config :logger,
 config :logger, :error_log,
   path: "log/error.log",
   format: "$date $time $metadata[$level] $message\n",
+  metadata: [:request_id],
   level: :error
 
 config :logger, :warn_log,
   path: "log/warn.log",
   format: "$date $time $metadata[$level] $message\n",
+  metadata: [:request_id],
   level: :warn
 
 config :logger, :info_log,
   path: "log/info.log",
   format: "$date $time $metadata[$level] $message\n",
+  metadata: [:request_id],
   level: :info
 
 config :logger, :debug_log,
   path: "log/debug.log",
   format: "$date $time $metadata[$level] $message\n",
+  metadata: [:request_id],
   level: :debug
