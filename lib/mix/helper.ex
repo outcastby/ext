@@ -12,7 +12,7 @@ defmodule Mix.Helper do
   def lookup_image_name(tag \\ nil), do: "#{lookup_image_repository()}:#{tag || lookup_image_tag()}"
 
   def lookup_image_tag do
-    {hash, _} = System.cmd("git", ["rev-parse", "--short", "HEAD"])
+    {hash, _} = System.cmd("git", ["rev-parse", "--short=7", "HEAD"])
     branch_name = lookup_branch()
 
     cond do
