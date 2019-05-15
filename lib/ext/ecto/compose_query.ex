@@ -59,7 +59,7 @@ defmodule Ext.Ecto.ComposeQuery do
         is_nil(value) && type == "=" -> dynamic([entity], is_nil(field(entity, ^key)))
         is_nil(value) && type == "!=" -> dynamic([entity], not is_nil(field(entity, ^key)))
         type == "=" -> dynamic([entity], field(entity, ^key) == ^value)
-        type == "!=" -> dynamic([entity], field(entity, ^key) != ^value)
+        type == "!=" -> dynamic([entity], field(entity, ^key) != ^value or is_nil(field(entity, ^key)))
       end
 
     dynamic([entity], ^build_dynamic(query, condition))
