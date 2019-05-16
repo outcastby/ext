@@ -111,4 +111,11 @@ defmodule Ext.Utils.Base do
   rescue
     ArgumentError -> nil
   end
+
+  def uuid?(string) do
+    case Ecto.UUID.cast(string) do
+      {:ok, _} -> true
+      :error -> false
+    end
+  end
 end
