@@ -5,7 +5,7 @@ defmodule Ext.Validators.Uniq do
   def call(form, args) do
     {schema, repo, fields, message} = parse_args(args)
     {_, repo} = Ext.Utils.Repo.get_config(repo)
-    message = if message, do: message, else: "Not unique"
+    message = if message, do: message, else: "not_unique"
 
     checked_fields = Map.take(form.changes, fields)
 
