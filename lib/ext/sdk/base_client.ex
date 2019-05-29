@@ -102,9 +102,10 @@ defmodule Ext.Sdk.BaseClient do
           _ -> {status, response}
         end
       end
+      defoverridable handle_response: 2
 
       def handle_error(message) do
-        Logger.error(message)
+        Logger.error(inspect(message))
         {:error, message}
       end
 
