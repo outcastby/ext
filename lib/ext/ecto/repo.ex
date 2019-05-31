@@ -4,6 +4,7 @@ defmodule Ext.Ecto.Repo do
   defmacro __using__(_) do
     quote do
       import Ecto.Query
+      use Commands.Base
 
       defoverridable exists?: 2, get_by: 3, get_by!: 3
 
