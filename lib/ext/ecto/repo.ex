@@ -69,17 +69,21 @@ defmodule Ext.Ecto.Repo do
         get(module, id)
       end
 
-      def save(%{__meta__: %{state: :built}} = schema, data),
-        do: schema |> schema.__struct__.changeset(data) |> __MODULE__.insert()
+      def save(struct, data), do: save(struct, data, nil)
+      def save!(struct, data), do: save(struct, data, "!")
 
-      def save(%{__meta__: %{state: :loaded}} = schema, data),
-        do: schema |> schema.__struct__.changeset(data) |> __MODULE__.update()
+      def save(struct, data, bang),
+        do: apply(__MODULE__, String.to_atom("insert_or_update#{bang}"), [struct.__struct__.changeset(struct, data)])
 
-      def save!(%{__meta__: %{state: :built}} = schema, data),
-        do: schema |> schema.__struct__.changeset(data) |> __MODULE__.insert!()
+      def get_or_insert(schema, query, extra_params \\ %{}), do: get_or_insert(schema, query, extra_params, nil)
+      def get_or_insert!(schema, query, extra_params \\ %{}), do: get_or_insert(schema, query, extra_params, "!")
 
-      def save!(%{__meta__: %{state: :loaded}} = schema, data),
-        do: schema |> schema.__struct__.changeset(data) |> __MODULE__.update!()
+      defp get_or_insert(schema, query, extra_params, bang) do
+        case schema |> __MODULE__.get_by(query) do
+          nil -> apply(__MODULE__, String.to_atom("save#{bang}"), [schema.__struct__, query ||| extra_params])
+          entity -> {:ok, entity}
+        end
+      end
     end
   end
 end

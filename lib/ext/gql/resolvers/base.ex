@@ -97,7 +97,7 @@ defmodule Ext.Gql.Resolvers.Base do
     end
   end
 
-  def delete(schema, repo \\ nil, scope = %{}) do
+  def delete(schema, repo \\ nil, scope \\ %{}) do
     {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{id: id}, _info ->
