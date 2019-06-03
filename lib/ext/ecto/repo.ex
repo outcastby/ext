@@ -81,8 +81,14 @@ defmodule Ext.Ecto.Repo do
 
       defp get_or_insert(schema, query, extra_params, bang) do
         case schema |> __MODULE__.get_by(query) do
-          nil -> apply(__MODULE__, String.to_atom("save#{bang}"), [schema.__struct__, query ||| extra_params])
-          entity -> {:ok, entity}
+          nil ->
+            apply(__MODULE__, String.to_atom("save#{bang}"), [schema.__struct__, query ||| extra_params])
+
+          entity ->
+            case bang do
+              "!" -> entity
+              _ -> {:ok, entity}
+            end
         end
       end
     end
