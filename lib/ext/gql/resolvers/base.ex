@@ -15,9 +15,13 @@ defmodule Ext.Gql.Resolvers.Base do
     end
   end
 
-  def send_errors(form, code \\ 400, message \\ "Validation Error") do
+  def send_errors(form, code \\ 400, message \\ "Validation Error")
+
+  def send_errors(%Ecto.Changeset{} = form, code, message) do
     {:error, message: message, code: code, details: ProperCase.to_camel_case(Ext.Utils.Forms.error(form))}
   end
+
+  def send_errors(message, code, _), do: {:error, message: message, code: code}
 
   def all(schema, preload \\ [], repo \\ nil) do
     {app_name, repo} = Ext.Utils.Repo.get_config(repo)
