@@ -75,7 +75,7 @@ defmodule Mix.Tasks.Ext.DeployTest do
          ]},
         {Ext.Commands.SendToSlack, [], [call: fn _, _, _ -> "" end]},
         {Ext.Shell, [], [exec: fn _, _, _ -> "" end]},
-        {String, [], [replace: fn _, _, _ -> "" end]}
+        {String, [], [replace: fn _, _, _ -> "" end, split: fn _, _ -> ["master-v0.1.0"] end]}
       ]) do
         result = Mix.Tasks.Ext.Deploy.run(["prod", "master-v0.2.0"])
 

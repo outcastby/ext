@@ -6,6 +6,7 @@ defmodule Ext.MixProject do
       app: :ext,
       version: "0.1.0",
       elixir: "~> 1.7",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -17,6 +18,9 @@ defmodule Ext.MixProject do
       extra_applications: [:logger]
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
@@ -33,7 +37,11 @@ defmodule Ext.MixProject do
       {:postgrex, ">= 0.0.0-rc"},
       {:plug_cowboy, "~> 2.0"},
       {:logger_file_backend, "~> 0.0.10"},
-      {:mock, "0.3.3", only: :test}
+      {:mock, "0.3.3", only: :test},
+      {:joken, "~> 2.0"},
+      {:ja_serializer, "~> 0.13.0"},
+      {:ecto_enum, "~> 1.0"},
+      {:dataloader, "~> 1.0.0"}
     ]
   end
 end

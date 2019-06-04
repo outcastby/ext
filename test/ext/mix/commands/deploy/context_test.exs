@@ -18,9 +18,9 @@ defmodule Mix.Commands.Deploy.ContextTest do
 
     test "prod environment" do
       with_mocks([
-        {System, [],
+        {System, [:passthrough],
          [cmd: fn _, _ -> {"{\"image\": {\"name\": \"master-v0.1.0\"}}", 0} end, find_executable: fn _ -> "" end]},
-        {String, [], [replace: fn _, _, _ -> "" end]}
+        {String, [:passthrough], [replace: fn _, _, _ -> "" end]}
       ]) do
         result = Mix.Commands.Deploy.Context.init("prod", "master-v0.2.0")
 
