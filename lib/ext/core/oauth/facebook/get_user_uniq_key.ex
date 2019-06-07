@@ -1,4 +1,6 @@
 defmodule Ext.Oauth.Facebook.GetUserUniqKey do
+  require IEx
+
   def call(%{access_token: user_token} = auth_response) do
     user_token
     |> Ext.Facebook.DecodeUserToken.call()
@@ -14,7 +16,7 @@ defmodule Ext.Oauth.Facebook.GetUserUniqKey do
 
   defp check_app_id(%{app_id: app_id} = token_data) do
     cond do
-      app_id == System.get_env("FACEBOOK_CLIENT_ID") -> token_data
+      app_id == Application.get_env(Mix.Project.config()[:app], :ext)[:facebook_client_id] -> token_data
       true -> raise("Invalid facebook app_id")
     end
   end

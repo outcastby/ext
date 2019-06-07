@@ -21,6 +21,9 @@ defmodule Ext.Gql.Resolvers.Base do
     {:error, message: message, code: code, details: ProperCase.to_camel_case(Ext.Utils.Forms.error(form))}
   end
 
+  def send_errors({message, details}, code, _),
+      do: {:error, message: message, details: ProperCase.to_camel_case(details), code: code}
+
   def send_errors(message, code, _), do: {:error, message: message, code: code}
 
   def all(schema, preload \\ [], repo \\ nil) do

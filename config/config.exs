@@ -29,4 +29,6 @@ use Mix.Config
 #
 #     import_config "#{Mix.env()}.exs"
 
-config :ext, :ext, google_client_id: System.get_env("GOOGLE_CLIENT_ID")
+config :ext, :ext,
+  google_client_id: System.get_env("GOOGLE_CLIENT_ID"),
+  facebook_client_id: System.get_env("FACEBOOK_CLIENT_ID")

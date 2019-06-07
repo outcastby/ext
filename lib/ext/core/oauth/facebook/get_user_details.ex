@@ -4,12 +4,18 @@ defmodule Ext.Oauth.Facebook.GetUserDetails do
 
   def call(%{access_token: access_token}) do
     request = %Ext.Sdk.Request{
-      payload: %{fields: "id,name,email", access_token: access_token}
+      payload: %{fields: "id,email,first_name,last_name,name", access_token: access_token}
     }
 
     case Ext.Sdk.Facebook.Client.me(request) do
-      {:ok, response} ->
-        response |> Ext.Utils.Base.to_atom() |> Map.take([:email, :name, :id])
+      {:ok, fb_user} ->
+        %Oauth.User{
+          email: fb_user["email"],
+          first_name: fb_user["first_name"],
+          last_name: fb_user["last_name"],
+          full_name: fb_user["name"],
+          id: fb_user["sub"]
+        }
 
       {:error, response} ->
         Logger.error("Error get info about player for facebook, message - #{inspect(response)}")
