@@ -41,7 +41,8 @@ defmodule Ext.MixProject do
       {:joken, "~> 2.0"},
       {:ja_serializer, "~> 0.13.0"},
       {:ecto_enum, "~> 1.0"},
-      {:dataloader, "~> 1.0.0"}
+      {:dataloader, "~> 1.0.0"},
+      {:extwitter, "~> 0.8"}
     ]
   end
 end

@@ -1,6 +1,5 @@
 defmodule Ext.Gql.Resolvers.OauthTest do
   use ExUnit.Case
-  import Ext.Utils.Map
   import Mock
   require IEx
 
@@ -96,12 +95,8 @@ defmodule Ext.Gql.Resolvers.OauthTest do
           Ext.Gql.Resolvers.Oauth.authorize(%{
             repo: Oauth.TestRepo,
             schemas: %{user: TestUser, auth: TestAuthorization},
-            required_fields: [:email],
-            form: TestForm
-          }).(
-            google_args,
-            %{}
-          )
+            required_fields: [:email]
+          }).(google_args, %{})
 
         assert called(
                  Oauth.TestRepo.get_or_insert!(TestUser, %{email: "miheykrug@gmail.com"}, %{
@@ -135,12 +130,8 @@ defmodule Ext.Gql.Resolvers.OauthTest do
           Ext.Gql.Resolvers.Oauth.authorize(%{
             repo: Oauth.TestRepo,
             schemas: %{user: TestUser, auth: TestAuthorization},
-            required_fields: [:email],
-            form: TestForm
-          }).(
-            google_args,
-            %{}
-          )
+            required_fields: [:email]
+          }).(google_args, %{})
 
         refute called(Oauth.TestRepo.get_or_insert!(:_, :_, :_))
         refute called(Ecto.build_assoc(:_, :_, :_))
@@ -149,7 +140,7 @@ defmodule Ext.Gql.Resolvers.OauthTest do
     end
   end
 
-  describe "facebook auth without email in params" do
+  describe "facebook auth" do
     test "new user, facebook with email", %{fb_args_with_email: fb_args_with_email} do
       with_mock(Oauth.TestRepo, [:passthrough],
         get_or_insert!: fn _, _, _ -> %TestUser{id: 1, email: "fb_first_id@facebook.com"} end
@@ -158,12 +149,8 @@ defmodule Ext.Gql.Resolvers.OauthTest do
           Ext.Gql.Resolvers.Oauth.authorize(%{
             repo: Oauth.TestRepo,
             schemas: %{user: TestUser, auth: TestAuthorization},
-            required_fields: [:email],
-            form: TestForm
-          }).(
-            fb_args_with_email,
-            %{}
-          )
+            required_fields: [:email]
+          }).(fb_args_with_email, %{})
 
         assert called(
                  Oauth.TestRepo.get_or_insert!(TestUser, %{email: "fb_first_id@facebook.com"}, %{
@@ -183,59 +170,38 @@ defmodule Ext.Gql.Resolvers.OauthTest do
     end
 
     test "new user, facebook without email", %{fb_args_without_email: fb_args_without_email} do
-      with_mock(Oauth.TestRepo, [:passthrough],
-        get_or_insert!: fn _, _, _ -> %TestUser{id: 1, email: "fb_first_id@facebook.com"} end
-      ) do
+      with_mocks([
+        {Ecto, [:passthrough],
+         [build_assoc: fn _, _, _ -> %TestAuthorization{id: 1, uid: "fb_user_id", provider: :facebook} end]},
+        {Oauth.TestRepo, [:passthrough], save!: fn _, _ -> %TestUser{id: 1, email: nil} end}
+      ]) do
         response =
           Ext.Gql.Resolvers.Oauth.authorize(%{
             repo: Oauth.TestRepo,
             schemas: %{user: TestUser, auth: TestAuthorization},
-            required_fields: [:email],
-            form: TestForm
-          }).(
-            fb_args_without_email,
-            %{}
-          )
+            required_fields: [:email]
+          }).(fb_args_without_email, %{})
 
         refute called(Oauth.TestRepo.get_or_insert!(TestUser, :_, :_))
-        refute called(Ecto.build_assoc(:_, :_, :_))
-
-        assert response ==
-                 {:error, [message: :authorization_not_complete, details: %{"email" => ["can't be blank"]}, code: 400]}
-      end
-    end
-
-    test "new user with email in args", %{fb_args_without_email: fb_args_without_email} do
-      with_mock(Oauth.TestRepo, [:passthrough],
-        get_or_insert!: fn _, _, _ -> %TestUser{id: 1, email: "fb_first_id@facebook.com"} end,
-        save!: fn _, %{email: "test@test.com"} -> %TestUser{id: 1, email: "test@test.com"} end
-      ) do
-        args_with_email = %{
-          fb_args_without_email
-          | payload: fb_args_without_email.payload ||| %{entity: %{email: "test@test.com"}}
-        }
-
-        {:ok, user} =
-          Ext.Gql.Resolvers.Oauth.authorize(%{
-            repo: Oauth.TestRepo,
-            schemas: %{user: TestUser, auth: TestAuthorization},
-            required_fields: [:email],
-            form: TestForm
-          }).(
-            args_with_email,
-            %{}
-          )
-
-        assert called(Oauth.TestRepo.save!(TestUser.__struct__(), %{email: "test@test.com"}))
+        assert called(Oauth.TestRepo.save!(TestUser.__struct__(), :_))
 
         assert called(
-                 Ecto.build_assoc(%TestUser{email: "test@test.com", id: 1}, :test_authorizations, %{
+                 Ecto.build_assoc(%TestUser{email: nil, id: 1}, :test_authorizations, %{
                    provider: :facebook,
                    uid: "fb_user_id"
                  })
                )
 
-        assert user.email == "test@test.com"
+        assert response ==
+                 {:error,
+                  [
+                    message: :authorization_not_complete,
+                    details: %{
+                      "missingFields" => [:email],
+                      "oauthData" => %{"provider" => :facebook, "uid" => "fb_user_id"}
+                    },
+                    code: 400
+                  ]}
       end
     end
 
@@ -254,12 +220,8 @@ defmodule Ext.Gql.Resolvers.OauthTest do
           Ext.Gql.Resolvers.Oauth.authorize(%{
             repo: Oauth.TestRepo,
             schemas: %{user: TestUser, auth: TestAuthorization},
-            required_fields: [:email],
-            form: TestForm
-          }).(
-            fb_args_without_email,
-            %{}
-          )
+            required_fields: [:email]
+          }).(fb_args_without_email, %{})
 
         refute called(Oauth.TestRepo.get_or_insert!(:_, :_, :_))
         refute called(Ecto.build_assoc(:_, :_, :_))

@@ -3,7 +3,7 @@ defmodule Ext.Oauth.Authorize do
 
   def call(
         %{provider: provider} = args,
-        %{repo: repo, schemas: %{user: user_schema, auth: auth_schema}} = params
+        %{repo: repo, schemas: %{user: user_schema, auth: auth_schema}, required_fields: required_fields} = params
       ) do
     uid = Ext.Oauth.GetUserUniqKey.call(args)
 
@@ -16,7 +16,7 @@ defmodule Ext.Oauth.Authorize do
         Ext.Oauth.SignUp.call(args, uid, params)
 
       authorization ->
-        {:ok, Ext.Utils.Base.get_in(authorization, [user_assoc])}
+        Ext.Oauth.SignIn.call(Ext.Utils.Base.get_in(authorization, [user_assoc]), authorization, required_fields)
     end
   end
 end
