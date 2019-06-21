@@ -22,18 +22,20 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def send_errors({message, details}, code, _),
-      do: {:error, message: message, details: ProperCase.to_camel_case(details), code: code}
+    do: {:error, message: message, details: ProperCase.to_camel_case(details), code: code}
 
   def send_errors(message, code, _), do: {:error, message: message, code: code}
 
   def all(schema, preload \\ [], repo \\ nil) do
-    {app_name, repo} = Ext.Utils.Repo.get_config(repo)
+    {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn args, _ ->
-      page_limit = args[:limit] || Application.get_env(app_name, :page_limit) || 20
+      page_limit = args[:limit]
       offset = args[:offset] || 0
       filter = if args[:filter], do: args[:filter], else: %{}
-      order_by = if args[:order], do: Ext.Utils.Base.to_keyword_list(args[:order]), else: [desc: :inserted_at]
+
+      order_by =
+        if args[:order], do: Ext.Utils.Base.to_keyword_list(args[:order]), else: [desc: :inserted_at, desc: :id]
 
       try do
         entities =
@@ -155,5 +157,13 @@ defmodule Ext.Gql.Resolvers.Base do
       {:assoc, %{queryable: queryable}} -> queryable
       _ -> nil
     end
+  end
+
+  def total(%{repo: repo, schema: schema} = args, _) do
+    filter = if args[:filter], do: args[:filter], else: %{}
+    schema = String.to_atom("Elixir.#{schema}")
+    repo = String.to_atom("Elixir.#{repo}")
+
+    {:ok, schema |> repo.where(filter) |> repo.aggregate(:count, :id)}
   end
 end
