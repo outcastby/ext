@@ -38,11 +38,9 @@ defmodule Ext.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:logger_file_backend, "~> 0.0.10"},
       {:mock, "0.3.3", only: :test},
-      {:joken, "~> 2.0"},
       {:ja_serializer, "~> 0.13.0"},
       {:ecto_enum, "~> 1.0"},
-      {:dataloader, "~> 1.0.0"},
-      {:extwitter, "~> 0.8"}
+      {:dataloader, "~> 1.0.0"}
     ]
   end
 end
