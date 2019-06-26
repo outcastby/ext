@@ -3,7 +3,7 @@ defmodule Ext.BaseForm do
     quote do
       schema unquote(name) do
         unquote(fields)
-        field :context, :map, default: %{}
+        field(:context, :map, default: %{})
       end
     end
   end
@@ -28,6 +28,10 @@ defmodule Ext.BaseForm do
       def build_args(params, context) do
         form = cast(__struct__(), params, Map.keys(__struct__()) -- [:__meta__, :__struct__, :context])
         __MODULE__.with_context(form, context)
+      end
+
+      def add_custom_error(%Ecto.Changeset{errors: errors} = changeset, key, message) do
+        %{changeset | errors: [{key, {message, []}} | errors], valid?: false}
       end
     end
   end
