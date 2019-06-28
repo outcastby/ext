@@ -27,7 +27,7 @@ defmodule Ext.Sdk.BaseClient do
       Returns tuple of parameters.
       """
       def perform(method, url, payload \\ %{}, headers \\ [], options \\ %{}),
-          do: Ext.Sdk.BaseClient.perform(__MODULE__, method, url, payload, headers, options)
+        do: Ext.Sdk.BaseClient.perform(__MODULE__, method, url, payload, headers, options)
 
       def gql(query, variables \\ nil), do: Ext.Sdk.BaseClient.gql(__MODULE__, query, variables)
 
@@ -100,17 +100,16 @@ defmodule Ext.Sdk.BaseClient do
   end
 
   defp perform_request(:get, url, payload, headers),
-       do: get(url, headers, params: payload, recv_timeout: @timeout, timeout: @timeout)
+    do: get(url, headers, params: payload, recv_timeout: @timeout, timeout: @timeout)
 
   defp perform_request(method, url, payload, headers),
-       do:
-         apply(__MODULE__, method, [
-           url,
-           prepare_payload(payload, headers),
-           headers,
-           recv_timeout: @timeout,
-           timeout: @timeout
-         ])
+    do:
+      apply(__MODULE__, method, [
+        url,
+        prepare_payload(payload, headers),
+        headers,
+        [recv_timeout: @timeout, timeout: @timeout]
+      ])
 
   def gql(module, query, variables) do
     Neuron.Config.set(url: config(module).base_url <> config(module).gql_path)
@@ -143,7 +142,7 @@ defmodule Ext.Sdk.BaseClient do
   def prepare_headers(headers), do: ["Content-Type": "application/json"] ++ headers
 
   def prepare_payload(payload, [{_, content_type} | _]) when content_type == "application/x-www-form-urlencoded",
-      do: {:form, Enum.to_list(payload)}
+    do: {:form, Enum.to_list(payload)}
 
   def prepare_payload(payload, _), do: Poison.encode!(payload)
 end
