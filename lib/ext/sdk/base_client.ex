@@ -67,7 +67,7 @@ defmodule Ext.Sdk.BaseClient do
 
     url = apply(module, :prepare_url, get_url_params(module, url, options))
 
-    Logger.metadata(sdk_name: name(module), method: method, process_url: process_url(url))
+    Logger.metadata(sdk: name(module), method: method, url: process_url(url))
 
     Logger.info("request: #{inspect(payload)}, headers: #{inspect(headers)}")
 
@@ -106,7 +106,7 @@ defmodule Ext.Sdk.BaseClient do
 
   def gql(module, query, variables) do
     url = config(module).base_url <> config(module).gql_path
-    Logger.metadata(sdk_name: name(module), process_url: url)
+    Logger.metadata(sdk: name(module), url: url)
 
     Neuron.Config.set(url: url)
     Neuron.Config.set(connection_opts: [recv_timeout: @timeout, timeout: @timeout])
