@@ -4,6 +4,7 @@ defmodule Ext.Sdk.BaseClient do
   require Logger
 
   @timeout 20_000
+  @base_headers ["Content-Type": "application/json"]
 
   defmacro __using__(endpoints: endpoints) do
     quote bind_quoted: [endpoints: endpoints] do
@@ -47,26 +48,18 @@ defmodule Ext.Sdk.BaseClient do
 
   def prepare_url(module, url), do: config(module).base_url <> url
 
-  def method_missing(module, method_name, %Ext.Sdk.Request{headers: headers, payload: payload, options: options}) do
-    call_missing(module, method_name, payload, headers, options)
-  end
+  def method_missing(module, method_name, %Ext.Sdk.Request{headers: headers, payload: payload, options: options}),
+    do: call_missing(module, method_name, payload, headers, options)
 
-  def method_missing(module, method_name, nil) do
-    call_missing(module, method_name, %{}, [], %{})
-  end
+  def method_missing(module, method_name, nil), do: call_missing(module, method_name, %{}, [], %{})
 
   @doc """
   Returns tuple of parameters.
   """
   def call_missing(module, method_name, payload, headers, options) do
-    case config(module) do
-      %{endpoints: %{^method_name => %{url: url, type: type}}} ->
-        url = if is_binary(url), do: url, else: url.(options.url_params)
-        perform(module, type, url, payload, headers, options)
-
-      _ ->
-        handle_error("Endpoint for #{inspect(method_name)} is not found")
-    end
+    %{endpoints: %{^method_name => %{url: url, type: type}}} = config(module)
+    url = if is_binary(url), do: url, else: url.(options.url_params)
+    perform(module, type, url, payload, headers, options)
   end
 
   def perform(module, method, url, payload, headers, options) do
@@ -100,7 +93,7 @@ defmodule Ext.Sdk.BaseClient do
   end
 
   defp perform_request(:get, url, payload, headers),
-    do: get(url, headers, params: payload, recv_timeout: @timeout, timeout: @timeout)
+    do: __MODULE__.get(url, headers, params: payload, recv_timeout: @timeout, timeout: @timeout)
 
   defp perform_request(method, url, payload, headers),
     do:
@@ -112,10 +105,20 @@ defmodule Ext.Sdk.BaseClient do
       ])
 
   def gql(module, query, variables) do
-    Neuron.Config.set(url: config(module).base_url <> config(module).gql_path)
+    url = config(module).base_url <> config(module).gql_path
+    Logger.metadata(sdk_name: name(module), process_url: url)
+
+    Neuron.Config.set(url: url)
     Neuron.Config.set(connection_opts: [recv_timeout: @timeout, timeout: @timeout])
-    {:ok, %Neuron.Response{body: body}} = Neuron.query(query, variables)
-    {:ok, body["data"]}
+
+    case Neuron.query(query, variables) do
+      {:error, resp} ->
+        handle_error("query: #{query}, response: #{inspect(resp)}")
+
+      {:ok, %Neuron.Response{body: body} = resp} ->
+        Logger.info("query: #{query}, response: #{inspect(resp)}")
+        {:ok, body["data"]}
+    end
   end
 
   def handle_response(response, status) do
@@ -127,7 +130,7 @@ defmodule Ext.Sdk.BaseClient do
   end
 
   def handle_error(message, metadata \\ []) do
-    Logger.error(inspect(message), metadata)
+    Logger.error(message, metadata)
     {:error, message}
   end
 
@@ -139,7 +142,10 @@ defmodule Ext.Sdk.BaseClient do
 
   def name(module), do: config(module).sdk_name
 
-  def prepare_headers(headers), do: ["Content-Type": "application/json"] ++ headers
+  def prepare_headers(headers) when is_map(headers),
+    do: headers |> Enum.into([]) |> prepare_headers()
+
+  def prepare_headers(headers), do: @base_headers ++ headers
 
   def prepare_payload(payload, [{_, content_type} | _]) when content_type == "application/x-www-form-urlencoded",
     do: {:form, Enum.to_list(payload)}

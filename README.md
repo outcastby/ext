@@ -1,21 +1,21 @@
 # Ext
 
-**TODO: Add description**
-
 ## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ext` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:ext, "~> 0.1.0"}
+    {:ext, git: "https://github.com/outcastby/ext.git"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/ext](https://hexdocs.pm/ext).
+## Ext.Sdk.BaseClient
+Add `:sdk_name, :method, :process_url` to metadata of logger console configuration.
+```elixir
+# config.exs
+config :logger, :console,
+  format: "$date $time $metadata[$level] $message\n",
+  metadata: [:sdk_name, :method, :process_url]
+```
 
