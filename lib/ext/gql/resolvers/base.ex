@@ -35,7 +35,11 @@ defmodule Ext.Gql.Resolvers.Base do
       filter = if args[:filter], do: args[:filter], else: %{}
 
       order_by =
-        if args[:order], do: Ext.Utils.Base.to_keyword_list(args[:order]), else: [desc: :inserted_at, desc: :id]
+        if args[:order],
+           do:
+             args[:order]
+             |> Enum.map(fn {key, value} -> {Ext.Utils.Base.to_atom(key), Ext.Utils.Base.to_atom(value)} end),
+           else: [desc: :inserted_at, desc: :id]
 
       try do
         entities =

@@ -1,7 +1,20 @@
 defmodule Ext.Utils.Base do
+  require IEx
   require Logger
 
   @moduledoc false
+
+  @doc ~S"""
+    Convert value to integer. If this is not possible returns value.
+
+    ##Examples
+
+      iex> Ext.Utils.Base.to_int("11")
+      11
+
+      iex> Ext.Utils.Base.to_int("error")
+      "error"
+  """
   def to_int(value) do
     case :string.to_integer(value) do
       {:error, _} -> value
@@ -9,21 +22,50 @@ defmodule Ext.Utils.Base do
     end
   end
 
+  @doc ~S"""
+    Convert simple value, list elements or map keys to atom.
+
+    ## Examples
+
+      iex> Ext.Utils.Base.to_atom("test")
+      :test
+
+      iex> Ext.Utils.Base.to_atom(nil)
+      nil
+
+      iex> Ext.Utils.Base.to_atom(["first", "second"])
+      [:first, :second]
+
+      iex> Ext.Utils.Base.to_atom(%{"first" => "test", "second" => "value"})
+      %{first: "test", second: "value"}
+
+      iex> Ext.Utils.Base.to_atom([{"first", "test"}, {"second", "value"}])
+      [first: "test", second: "value"]
+
+      iex> Ext.Utils.Base.to_atom([first: "test", second: "value"])
+      [first: "test", second: "value"]
+  """
+
   def to_atom(value) when is_binary(value), do: String.to_atom(value)
   def to_atom(value) when is_nil(value), do: nil
   def to_atom(value) when is_list(value), do: Enum.map(value, &__MODULE__.to_atom(&1))
+  def to_atom({key, value}), do: {__MODULE__.to_atom(key), value}
   def to_atom(value), do: AtomicMap.convert(value, safe: false)
 
-  def atomize_keys(map) when is_map(map), do: atomize_keys(map, %{})
+  @doc ~S"""
+    Convert map (or list of maps) keys to string.
 
-  def atomize_keys(map, result_type \\ []) do
-    for {key, val} <- map, into: result_type do
-      cond do
-        is_atom(key) -> {key, val}
-        true -> {String.to_atom(key), val}
-      end
-    end
-  end
+    ## Examples
+
+      iex> Ext.Utils.Base.stringify_keys(%{first: "test"})
+      %{"first" => "test"}
+
+      iex> Ext.Utils.Base.stringify_keys([%{first: 1}, %{second: "test"}])
+      [%{"first" => 1}, %{"second" => "test"}]
+
+      iex> Ext.Utils.Base.stringify_keys([%{first: %{nested: 1}}, %{second: "test"}])
+      [%{"first" => %{"nested" => 1}}, %{"second" => "test"}]
+  """
 
   def stringify_keys(nil), do: nil
 
@@ -43,17 +85,81 @@ defmodule Ext.Utils.Base do
 
   def snake_keys(map), do: ProperCase.to_snake_case(map)
 
+  @doc ~S"""
+    Convert value to string
+
+    ## Examples
+
+      iex> Ext.Utils.Base.to_str(:test)
+      "test"
+
+      iex> Ext.Utils.Base.to_str("test")
+      "test"
+
+      iex> Ext.Utils.Base.to_str(1.234)
+      "1.234"
+
+      iex> Ext.Utils.Base.to_str(%{test: "value"})
+      "%{test: \"value\"}"
+  """
   def to_str(value) when is_atom(value), do: Atom.to_string(value)
   def to_str(value) when is_binary(value), do: value
-  def to_str(value) when is_float(value), do: :erlang.float_to_binary(value, [:compact, {:decimals, 0}])
   def to_str(value), do: inspect(value)
 
   def to_negative(value), do: -1 * value
 
+  @doc ~S"""
+    Convert value to boolean
+
+    ## Examples
+
+      iex> Ext.Utils.Base.to_bool("true")
+      true
+
+      iex> Ext.Utils.Base.to_bool("false")
+      false
+
+      iex> Ext.Utils.Base.to_bool(nil)
+      false
+
+      iex> Ext.Utils.Base.to_bool(%{})
+      false
+
+      iex> Ext.Utils.Base.to_bool([])
+      false
+
+      iex> Ext.Utils.Base.to_bool({})
+      false
+
+      iex> Ext.Utils.Base.to_bool(%{test: "any"})
+      true
+  """
+
   def to_bool("true"), do: true
   def to_bool("false"), do: false
   def to_bool(nil), do: false
-  def to_bool(_any_value), do: true
+  def to_bool(value), do: !Blankable.blank?(value)
+
+  @doc ~S"""
+    Get value from object by path
+
+    ## Examples
+
+      iex> Ext.Utils.Base.get_in(%{test: %{nested: "value"}}, [:test, :nested])
+      "value"
+
+      iex> Ext.Utils.Base.get_in(%{"test" => %{"nested" => "value"}}, [:test, :nested])
+      "value"
+
+      iex> Ext.Utils.Base.get_in(%{"test" => %{"nested" => "value"}}, [:second, :nested])
+      nil
+
+      iex> Ext.Utils.Base.get_in(%TestUser{name: "test"}, [:name])
+      "test"
+
+      iex> Ext.Utils.Base.get_in(%TestUser{name: "test"}, [:invalid_field])
+      nil
+  """
 
   def get_in(object, list) do
     [source_column | path] = list
@@ -69,6 +175,21 @@ defmodule Ext.Utils.Base do
       true -> __MODULE__.get_in(new_value, path)
     end
   end
+
+  @doc ~S"""
+    Put value to object by path
+
+    ## Examples
+
+      iex> Ext.Utils.Base.put_in(%{test: %{nested: "value"}}, [:added], "add")
+      %{test: %{nested: "value"}, added: "add"}
+
+      iex> Ext.Utils.Base.put_in(%{test: %{nested: "value"}}, [:test, :added], "add")
+      %{test: %{nested: "value", added: "add"}}
+
+      iex> Ext.Utils.Base.put_in(%{test: %{nested: "value"}}, [:test, "added"], "add")
+      %{test: %{:nested => "value", "added" => "add"}}
+  """
 
   def put_in(object, path, value) when length(path) == 1 do
     key = List.first(path)
@@ -102,15 +223,35 @@ defmodule Ext.Utils.Base do
     end)
   end
 
-  def to_keyword_list(data) do
-    Enum.reduce(data, [], fn {key, value}, acc -> [{to_atom(key), to_atom(value)} | acc] end)
-  end
+  @doc ~S"""
+    Convert string to to_existing_atom without rising error
+
+    ## Examples
+
+      iex> Ext.Utils.Base.to_existing_atom("String")
+      :String
+
+      iex> Ext.Utils.Base.to_existing_atom("NotExist")
+      nil
+  """
 
   def to_existing_atom(string) do
     String.to_existing_atom(string)
   rescue
     ArgumentError -> nil
   end
+
+  @doc ~S"""
+    Check if string is uuid
+
+    ## Examples
+
+      iex> Ext.Utils.Base.uuid?("invalid")
+      false
+
+      iex> Ext.Utils.Base.uuid?(Ecto.UUID.generate())
+      true
+  """
 
   def uuid?(string) do
     case Ecto.UUID.cast(string) do

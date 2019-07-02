@@ -13,11 +13,11 @@ defmodule Ext.Ecto.Repo do
       end
 
       def get_by(queryable, clauses, opts) do
-        Ecto.Repo.Queryable.get_by(__MODULE__, queryable, Ext.Utils.Base.atomize_keys(clauses), opts)
+        Ecto.Repo.Queryable.get_by(__MODULE__, queryable, Ext.Utils.Base.to_atom(clauses), opts)
       end
 
       def get_by!(queryable, clauses, opts) do
-        Ecto.Repo.Queryable.get_by!(__MODULE__, queryable, Ext.Utils.Base.atomize_keys(clauses), opts)
+        Ecto.Repo.Queryable.get_by!(__MODULE__, queryable, Ext.Utils.Base.to_atom(clauses), opts)
       end
 
       def first(query) do
@@ -38,7 +38,7 @@ defmodule Ext.Ecto.Repo do
       def where(query, params), do: Ecto.Query.where(query, ^build_conditions(params))
 
       def build_conditions(params) do
-        Enum.reduce(Ext.Utils.Base.atomize_keys(params), nil, &Ext.Ecto.ComposeQuery.call(&1, &2, %{type: "="})) || true
+        Enum.reduce(Ext.Utils.Base.to_atom(params), nil, &Ext.Ecto.ComposeQuery.call(&1, &2, %{type: "="})) || true
       end
 
       def batch_insert(schema_or_source, entries, batch \\ 5_000, opts \\ []) do
