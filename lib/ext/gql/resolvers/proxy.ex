@@ -1,23 +1,44 @@
 defmodule Ext.Gql.Resolvers.Proxy do
+  require IEx
+
   @moduledoc """
     If the first argument is an atom or list of atoms, this argument is path. Else the first argument is default value
+
+    ## Examples with function call
+
+      iex> Ext.Gql.Resolvers.Proxy.call(:spin, 0).(%{spin: 1}, %{}, %{})
+      {:ok, 1}
+
+      iex> Ext.Gql.Resolvers.Proxy.call(:spin, 0).(%{spin: nil}, %{}, %{})
+      {:ok, 0}
+
+      iex> Ext.Gql.Resolvers.Proxy.call([:extra, :test]).(%{extra: %{test: "test"}}, %{}, %{})
+      {:ok, "test"}
+
+      iex> Ext.Gql.Resolvers.Proxy.call([:extra, :test]).(%{extra: %{test: nil}}, %{}, %{})
+      {:ok, nil}
+
+      iex> Ext.Gql.Resolvers.Proxy.call(10).(%{spin: 11}, %{}, %{definition: %{schema_node: %{identifier: :spin}}})
+      {:ok, 11}
+
+      iex> Ext.Gql.Resolvers.Proxy.call(10).(%{spin: nil}, %{}, %{definition: %{schema_node: %{identifier: :spin}}})
+      {:ok, 10}
   """
-  require IEx
 
   def call(fields \\ nil, default_value \\ nil)
 
   def call(fields, default_value) when is_atom(fields) do
-    do_call(fields, default_value)
+    perform(fields, default_value)
   end
 
   # Check if fields is list of atoms [:extra, :spin]
   def call([field | _] = fields, default_value) when is_atom(field) do
-    do_call(fields, default_value)
+    perform(fields, default_value)
   end
 
-  def call(default_value, nil), do: do_call(nil, default_value)
+  def call(default_value, nil), do: perform(nil, default_value)
 
-  defp do_call(fields, default_value) do
+  defp perform(fields, default_value) do
     fn parent, _args, info ->
       get_value(parent, field_name(fields, info), default_value)
     end
