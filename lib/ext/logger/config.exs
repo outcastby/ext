@@ -23,30 +23,37 @@ file_backends =
       []
   end
 
+metadata = [:request_id, :sdk, :method, :url]
+format = "$date $time $metadata[$level] $message\n"
+
 config :logger,
-  format: "$date $time $metadata[$level] $message\n",
+  format: format,
   backends: [:console, {Ext.Logger.Rollbar.ErrorSend, :error_log}] ++ file_backends
 
 config :logger, :error_log,
   path: "log/error.log",
-  format: "$date $time $metadata[$level] $message\n",
-  metadata: [:request_id],
+  format: format,
+  metadata: metadata,
   level: :error
 
 config :logger, :warn_log,
   path: "log/warn.log",
-  format: "$date $time $metadata[$level] $message\n",
-  metadata: [:request_id],
+  format: format,
+  metadata: metadata,
   level: :warn
 
 config :logger, :info_log,
   path: "log/info.log",
-  format: "$date $time $metadata[$level] $message\n",
-  metadata: [:request_id],
+  format: format,
+  metadata: metadata,
   level: :info
 
 config :logger, :debug_log,
   path: "log/debug.log",
-  format: "$date $time $metadata[$level] $message\n",
-  metadata: [:request_id],
+  format: format,
+  metadata: metadata,
   level: :debug
+
+config :logger, :console,
+  format: format,
+  metadata: metadata
