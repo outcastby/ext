@@ -3,7 +3,7 @@ defmodule Mix.Commands.Deploy.SendSlackNotificationTest do
   import Mock
 
   test ".call" do
-    with_mock(Ext.Commands.SendToSlack, call: fn _, _, _ -> "" end) do
+    with_mock(Ext.Sdk.Slack.Client, send: fn _ -> "" end) do
       result =
         Mix.Commands.Deploy.SendSlackNotification.call(
           %Mix.Commands.Deploy.Context{

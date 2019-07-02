@@ -73,7 +73,7 @@ defmodule Mix.Tasks.Ext.DeployTest do
            find_executable: fn _ -> "" end,
            get_env: fn _ -> "" end
          ]},
-        {Ext.Commands.SendToSlack, [], [call: fn _, _, _ -> "" end]},
+        {Ext.Sdk.Slack.Client, [], [send: fn _ -> "" end]},
         {Ext.Shell, [], [exec: fn _, _, _ -> "" end]},
         {String, [], [replace: fn _, _, _ -> "" end, split: fn _, _ -> ["master-v0.1.0"] end]}
       ]) do

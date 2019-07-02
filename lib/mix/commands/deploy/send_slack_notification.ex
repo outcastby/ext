@@ -12,8 +12,14 @@ defmodule Mix.Commands.Deploy.SendSlackNotification do
   end
 
   def call(%{tag: tag, env_name: env_name} = context, type) do
-    message = messages(env_name, tag)[type]
-    Ext.Commands.SendToSlack.call(Helper.settings()[:slack_token], Helper.settings()[:slack_channel], message)
+    payload = %Ext.Sdk.Request{
+      payload: %{
+        channel: Helper.settings()[:slack_channel],
+        text: messages(env_name, tag)[type]
+      }
+    }
+
+    Ext.Sdk.Slack.Client.send(payload)
     context
   end
 end
