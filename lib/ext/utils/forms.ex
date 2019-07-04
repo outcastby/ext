@@ -1,7 +1,16 @@
 defmodule Ext.Utils.Forms do
   @moduledoc false
   require Logger
+  require IEx
   import Ecto.Changeset
+
+  @doc ~S"""
+
+  ## Examples
+
+    iex> Ext.Utils.Forms.error(TestUser.changeset(%TestUser{}, %{}))
+    %{email: ["can't be blank"], name: ["can't be blank"]}
+  """
 
   def error(changeset) do
     traverse_errors(changeset, fn {msg, opts} ->

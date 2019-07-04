@@ -33,3 +33,5 @@ use Mix.Config
 config :logger, :console,
   format: "$date $time $metadata[$level] $message\n",
   metadata: [:sdk, :method, :url]
+
+import_config "#{Mix.env()}.exs"
