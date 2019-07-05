@@ -8,4 +8,5 @@ defmodule ExtTest do
   doctest Ext.Utils.Forms
   doctest Ext.Utils.List
   doctest Ext.Utils.Repo
+  doctest Ext.Gql.Resolvers.Base
 end

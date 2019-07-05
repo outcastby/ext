@@ -15,6 +15,21 @@ defmodule Ext.Gql.Resolvers.Base do
     end
   end
 
+  @doc ~S"""
+    Return tuple with gql errors
+
+    ## Examples
+
+      iex> Ext.Gql.Resolvers.Base.send_errors(TestUser.changeset(%TestUser{}, %{}))
+      {:error, message: "Validation Error", code: 400, details: %{"email" => ["can't be blank"], "name" => ["can't be blank"]}}
+
+      iex> Ext.Gql.Resolvers.Base.send_errors({:error_message, %{error_details: "error_details"}})
+      {:error, message: :error_message, details: %{"errorDetails" => "error_details"}, code: 400}
+
+      iex> Ext.Gql.Resolvers.Base.send_errors(:error_message)
+      {:error, message: :error_message, code: 400}
+  """
+
   def send_errors(form, code \\ 400, message \\ "Validation Error")
 
   def send_errors(%Ecto.Changeset{} = form, code, message) do
@@ -36,10 +51,10 @@ defmodule Ext.Gql.Resolvers.Base do
 
       order_by =
         if args[:order],
-           do:
-             args[:order]
-             |> Enum.map(fn {key, value} -> {Ext.Utils.Base.to_atom(key), Ext.Utils.Base.to_atom(value)} end),
-           else: [desc: :inserted_at, desc: :id]
+          do:
+            args[:order]
+            |> Enum.map(fn {key, value} -> {Ext.Utils.Base.to_atom(key), Ext.Utils.Base.to_atom(value)} end),
+          else: [desc: :inserted_at, desc: :id]
 
       try do
         entities =
@@ -78,7 +93,7 @@ defmodule Ext.Gql.Resolvers.Base do
       case get(schema, id, preload_assoc, repo, scope) do
         {:ok, entity} ->
           case valid?(form_module, Map.merge(entity_params, %{id: id})) do
-            true -> entity |> schema.changeset(entity_params) |> repo.update()
+            true -> repo.save(entity, entity_params)
             form -> send_errors(form)
           end
 
@@ -101,7 +116,8 @@ defmodule Ext.Gql.Resolvers.Base do
 
       case valid?(form_module, entity_params) do
         true ->
-          entity = struct(schema) |> schema.changeset(entity_params) |> repo.insert!()
+          entity = repo.save!(schema.__struct__, entity_params)
+          # ToDo: Figure out why used reload
           {:ok, entity |> repo.reload()}
 
         form ->
@@ -132,15 +148,11 @@ defmodule Ext.Gql.Resolvers.Base do
 
   defp parse_args(args), do: {args[:schema], args[:repo], args[:form], args[:scope] || %{}}
 
-  def valid?(form_module, entity_params) do
-    cond do
-      form_module ->
-        form = form_module.changeset(entity_params)
-        if form.valid?, do: true, else: form
+  def valid?(nil, _), do: true
 
-      true ->
-        true
-    end
+  def valid?(form_module, entity_params) do
+    form = form_module.changeset(entity_params)
+    if form.valid?, do: true, else: form
   end
 
   def build_assoc_data(schema, repo, entity_params) do

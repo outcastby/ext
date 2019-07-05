@@ -1,11 +1,10 @@
-defmodule TestUser do
+defmodule TestAssoc do
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "test_users" do
-    field(:name, :string)
-    field(:email, :string)
-    has_many(:test_assoc, TestAssoc)
+    field(:field, :string)
+    belongs_to(:test_user, TestUser)
   end
 
   def changeset(struct, params \\ %{}) do
