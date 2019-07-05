@@ -34,4 +34,10 @@ config :logger, :console,
   format: "$date $time $metadata[$level] $message\n",
   metadata: [:sdk, :method, :url]
 
+config :rollbax,
+  access_token: "fake",
+  environment: "env",
+  enabled: false,
+  enable_crash_reports: true
+
 import_config "#{Mix.env()}.exs"
