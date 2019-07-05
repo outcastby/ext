@@ -40,8 +40,7 @@ defmodule Ext.MixProject do
       {:mock, "0.3.3", only: :test},
       {:ja_serializer, "~> 0.13.0"},
       {:ecto_enum, "~> 1.0"},
-      {:dataloader, "~> 1.0.0"},
-      {:rollbax, ">= 0.10.0"},
+      {:dataloader, "~> 1.0.0"}
     ]
   end
 end
