@@ -36,8 +36,8 @@ defmodule Ext.Utils.Base do
       iex> Ext.Utils.Base.to_atom(["first", "second"])
       [:first, :second]
 
-      iex> Ext.Utils.Base.to_atom(%{"first" => "test", "second" => "value"})
-      %{first: "test", second: "value"}
+      iex> Ext.Utils.Base.to_atom(%{"first" => "test", "second" => %{"key" => "value"}})
+      %{first: "test", second: %{key: "value"}}
 
       iex> Ext.Utils.Base.to_atom([{"first", "test"}, {"second", "value"}])
       [first: "test", second: "value"]
@@ -49,7 +49,7 @@ defmodule Ext.Utils.Base do
   def to_atom(value) when is_binary(value), do: String.to_atom(value)
   def to_atom(value) when is_nil(value), do: nil
   def to_atom(value) when is_list(value), do: Enum.map(value, &__MODULE__.to_atom(&1))
-  def to_atom({key, value}), do: {__MODULE__.to_atom(key), value}
+  def to_atom({key, value}), do: {__MODULE__.to_atom(key), AtomicMap.convert(value, safe: false)}
   def to_atom(value), do: AtomicMap.convert(value, safe: false)
 
   @doc ~S"""
