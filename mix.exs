@@ -33,7 +33,6 @@ defmodule Ext.MixProject do
       {:jason, "~> 1.0"},
       {:httpoison, "~> 1.4.0"},
       {:blankable, "~> 0.0.1"},
-      {:neuron, "~> 1.0.0"},
       {:postgrex, ">= 0.0.0-rc"},
       {:plug_cowboy, "~> 2.0"},
       {:logger_file_backend, "~> 0.0.10"},
