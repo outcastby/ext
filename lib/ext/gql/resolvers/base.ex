@@ -156,17 +156,19 @@ defmodule Ext.Gql.Resolvers.Base do
   end
 
   def build_assoc_data(schema, repo, entity_params) do
-    Enum.reduce(entity_params, {entity_params, []}, fn {k, v}, {entity_params, preload_assoc} ->
-      assoc_schema = get_assoc_schema(schema, k)
-
-      if is_list(v) && assoc_schema do
-        assoc_entities = assoc_schema |> repo.where(id: v) |> repo.all()
-        {Map.merge(entity_params, %{k => assoc_entities}), preload_assoc ++ [k]}
-      else
-        {entity_params, preload_assoc}
-      end
+    Enum.reduce(entity_params, {entity_params, []}, fn {k, _} = parameter, {entity_params, preload_assoc} ->
+      schema |> get_assoc_schema(k) |> assoc_data_handler(parameter, repo, entity_params, preload_assoc)
     end)
   end
+
+  defp assoc_data_handler(nil, _, _, entity_params, preload_assoc), do: {entity_params, preload_assoc}
+
+  defp assoc_data_handler(assoc_schema, {k, v}, repo, entity_params, preload_assoc) when is_list(v) do
+    assoc_entities = assoc_schema |> repo.where(id: v) |> repo.all()
+    {Map.merge(entity_params, %{k => assoc_entities}), preload_assoc ++ [k]}
+  end
+
+  defp assoc_data_handler(_, {k, _}, _, entity_params, preload_assoc), do: {entity_params, preload_assoc ++ [k]}
 
   def get_assoc_schema(schema, key) do
     case schema.__changeset__[key] do
