@@ -5,7 +5,9 @@ defmodule TestUser do
   schema "test_users" do
     field(:name, :string)
     field(:email, :string)
-    has_many(:test_many_assoc, TestManyAssoc)
+    field(:count, :integer)
+    field(:locale, :string)
+    has_many(:test_many_assocs, TestManyAssoc)
     has_one(:test_one_assoc, TestOneAssoc)
   end
 

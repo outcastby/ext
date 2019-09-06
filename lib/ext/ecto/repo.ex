@@ -25,20 +25,28 @@ defmodule Ext.Ecto.Repo do
       end
 
       def where(query, {:or, conditions}) when is_list(conditions),
-        do: Ecto.Query.where(query, ^build_or_dynamic(conditions))
+        do: Ecto.Query.where(query, ^build_or_dynamic(conditions, query))
 
-      def build_or_dynamic(conditions) do
+      def build_or_dynamic(conditions, query) do
         Enum.reduce(conditions, nil, fn params, dynamic ->
           if dynamic,
-            do: Ecto.Query.dynamic([e], ^build_conditions(params) or ^dynamic),
-            else: Ecto.Query.dynamic([e], ^build_conditions(params))
+            do: Ecto.Query.dynamic([e], ^build_conditions(params, query) or ^dynamic),
+            else: Ecto.Query.dynamic([e], ^build_conditions(params, query))
         end)
       end
 
-      def where(query, params), do: Ecto.Query.where(query, ^build_conditions(params))
+      def where(query, params), do: Ecto.Query.where(query, ^build_conditions(params, query))
 
-      def build_conditions(params) do
-        Enum.reduce(Ext.Utils.Base.to_atom(params), nil, &Ext.Ecto.ComposeQuery.call(&1, &2, %{type: "="})) || true
+      def build_conditions(params, query) do
+        Enum.reduce(
+          Ext.Utils.Base.to_atom(params),
+          nil,
+          &Ext.Ecto.ComposeQuery.call(&1, &2, %{
+            main_query: query,
+            type: "=",
+            table_module: Ext.Ecto.GetCondition.Table0
+          })
+        ) || true
       end
 
       def batch_insert(schema_or_source, entries, batch \\ 5_000, opts \\ []) do

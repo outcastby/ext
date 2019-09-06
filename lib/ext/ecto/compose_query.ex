@@ -1,44 +1,26 @@
 defmodule Ext.Ecto.ComposeQuery do
   import Ecto.Query
+  import Ext.Utils.Map
+  require IEx
 
-  @doc """
-    iex> where(query, %{position: %{sign: ">", value: 1}})
-    WHERE position > 1
-  """
   def call({key, value}, query, extra) when is_map(value) do
-    call({key, {value[:sign] || value["sign"], value["value"] || value[:value]}}, query, extra)
+    handle_map_value({key, Ext.Utils.Base.to_atom(value)}, query, extra)
   end
 
   @doc """
     iex> where(query, %{position: {"=", 1})
     WHERE position = 1
   """
-  def call({key, {"=", value}}, query, _extra), do: call({key, value}, query, %{type: "="})
+  def call({key, {"=", value}}, query, extra), do: call({key, value}, query, extra ||| %{type: "="})
 
   @doc """
     iex> where(query, %{position: {"!=", 1})
     WHERE position != 1
   """
-  def call({key, {"!=", value}}, query, _extra), do: call({key, value}, query, %{type: "!="})
+  def call({key, {"!=", value}}, query, extra), do: call({key, value}, query, extra ||| %{type: "!="})
 
-  def call({key, {sign, value}}, query, _extra) do
-    condition =
-      case sign do
-        ">" ->
-          dynamic([entity], field(entity, ^key) > ^value)
-
-        ">=" ->
-          dynamic([entity], field(entity, ^key) >= ^value)
-
-        "<" ->
-          dynamic([entity], field(entity, ^key) < ^value)
-
-        "<=" ->
-          dynamic([entity], field(entity, ^key) <= ^value)
-
-        "~=" ->
-          dynamic([entity], like(fragment("lower(?)", field(entity, ^key)), fragment("lower(?)", ^"%#{value}%")))
-      end
+  def call({key, {sign, value}}, query, %{table_module: table_module} = extra) do
+    condition = table_module.call({key, {sign, value}}, extra)
 
     dynamic([entity], ^build_dynamic(query, condition))
   end
@@ -51,18 +33,36 @@ defmodule Ext.Ecto.ComposeQuery do
     call({key, {sign, value}}, query, extra)
   end
 
-  def call({key, value}, query, %{type: type}) do
-    condition =
-      cond do
-        is_list(value) && type == "=" -> dynamic([entity], field(entity, ^key) in ^value)
-        is_list(value) && type == "!=" -> dynamic([entity], field(entity, ^key) not in ^value)
-        is_nil(value) && type == "=" -> dynamic([entity], is_nil(field(entity, ^key)))
-        is_nil(value) && type == "!=" -> dynamic([entity], not is_nil(field(entity, ^key)))
-        type == "=" -> dynamic([entity], field(entity, ^key) == ^value)
-        type == "!=" -> dynamic([entity], field(entity, ^key) != ^value or is_nil(field(entity, ^key)))
-      end
+  def call({key, value}, query, extra) do
+    condition = extra.table_module.call({key, value}, extra)
 
     dynamic([entity], ^build_dynamic(query, condition))
+  end
+
+  @doc """
+    iex> where(query, %{position: %{sign: ">", value: 1}})
+    WHERE position > 1
+  """
+  def handle_map_value({key, %{sign: sign, value: value}}, query, extra), do: call({key, {sign, value}}, query, extra)
+
+  @doc """
+    iex> where(query, %{user: %{name: "Test Name"})
+    WHERE position = 1
+  """
+  def handle_map_value({key, value}, query, %{main_query: %{joins: joins}} = extra) do
+    table_number =
+      case Enum.find_index(joins, fn %{assoc: {_, assoc}} -> assoc == key end) do
+        nil -> 0
+        index -> index + 1
+      end
+
+    module = String.to_existing_atom("Elixir.Ext.Ecto.GetCondition.Table#{table_number}")
+
+    Enum.reduce(
+      Ext.Utils.Base.to_atom(value),
+      query,
+      &call(&1, &2, extra ||| %{table_module: module})
+    ) || true
   end
 
   def build_dynamic(nil, condition), do: dynamic([entity], ^condition)
