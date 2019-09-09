@@ -25,13 +25,13 @@ defmodule Ext.Ecto.Repo do
       end
 
       def where(query, {:or, conditions}) when is_list(conditions),
-        do: Ecto.Query.where(query, ^build_or_dynamic(conditions, query))
+          do: Ecto.Query.where(query, ^build_or_dynamic(conditions, query))
 
       def build_or_dynamic(conditions, query) do
         Enum.reduce(conditions, nil, fn params, dynamic ->
           if dynamic,
-            do: Ecto.Query.dynamic([e], ^build_conditions(params, query) or ^dynamic),
-            else: Ecto.Query.dynamic([e], ^build_conditions(params, query))
+             do: Ecto.Query.dynamic([e], ^build_conditions(params, query) or ^dynamic),
+             else: Ecto.Query.dynamic([e], ^build_conditions(params, query))
         end)
       end
 
@@ -82,7 +82,7 @@ defmodule Ext.Ecto.Repo do
       def save!(struct, data), do: save(struct, data, "!")
 
       def save(struct, data, bang),
-        do: apply(__MODULE__, String.to_atom("insert_or_update#{bang}"), [struct.__struct__.changeset(struct, data)])
+          do: apply(__MODULE__, String.to_atom("insert_or_update#{bang}"), [struct.__struct__.changeset(struct, data)])
 
       def get_or_insert(schema, query, extra_params \\ %{}), do: get_or_insert(schema, query, extra_params, nil)
       def get_or_insert!(schema, query, extra_params \\ %{}), do: get_or_insert(schema, query, extra_params, "!")
@@ -98,6 +98,49 @@ defmodule Ext.Ecto.Repo do
               _ -> {:ok, entity}
             end
         end
+      end
+
+      @doc """
+        iex> User |> join(:posts)
+        INNER JOIN "posts" AS p1 ON p1."user_id" = u0."id"
+
+        iex> User |> join(:posts, :left)
+        LEFT OUTER JOIN "posts" AS p1 ON p1."user_id" = u0."id"
+
+        iex> User |> join([:posts, :country])
+        INNER JOIN "posts" AS p1 ON p1."user_id" = u0."id"
+        INNER JOIN "country" AS c2 ON c2."id" = u0."country_id"
+
+        iex> User |> join(%{posts: :comments})
+        INNER JOIN "posts" AS p1 ON p1."user_id" = u0."id"
+        INNER JOIN "comments" AS c2 ON c2."post_id" = p1."id"
+
+        iex> User |> join(%{posts: [:comments, :likes]})
+        INNER JOIN "posts" AS p1 ON p1."user_id" = u0."id"
+        INNER JOIN "comments" AS c2 ON c2."post_id" = p1."id"
+        INNER JOIN "likes" AS l3 ON l3."post_id" = p1."id"
+      """
+      def join(query, params, type \\ :inner)
+
+      def join(query, params, type) when is_list(params) do
+        Enum.reduce(params, query, &__MODULE__.join(&2, &1, type))
+      end
+
+      def join(query, params, type) when is_map(params) do
+        [association] = Map.keys(params)
+        __MODULE__.join(query, association, type) |> nested_join(params[association], type)
+      end
+
+      def join(query, association, type) do
+        query |> join(type, [entity], assoc in assoc(entity, ^association))
+      end
+
+      defp nested_join(query, params, type) when is_list(params) do
+        Enum.reduce(params, query, &nested_join(&2, &1, type))
+      end
+
+      defp nested_join(query, association, type) do
+        query |> join(type, [entity, assoc1], assoc2 in assoc(assoc1, ^association))
       end
     end
   end
