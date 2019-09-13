@@ -16,6 +16,9 @@ defmodule Ext.BaseForm do
       import Ecto.Changeset
 
       @primary_key false
+
+      def call(params, context \\ %{}), do: build_args(params, context) |> changeset()
+
       def with_context(form, params) do
         old_params = get_in(form.changes, [:context])
 
