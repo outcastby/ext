@@ -78,6 +78,8 @@ defmodule Ext.Ecto.Repo do
         get(module, id)
       end
 
+      def lock_for_update(query), do: Ecto.Query.lock(query, "FOR UPDATE")
+
       def save(struct, data), do: save(struct, data, nil)
       def save!(struct, data), do: save(struct, data, "!")
 
