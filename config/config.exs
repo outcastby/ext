@@ -34,4 +34,10 @@ config :logger, :console,
   format: "$date $time $metadata[$level] $message\n",
   metadata: [:sdk, :method, :url]
 
+config :ext, :ext,
+  ws: [
+    subscriptions: [:subscription_1, :subscription_1],
+    endpoint: "ExtWeb.Endpoint should be atom"
+  ]
+
 import_config "#{Mix.env()}.exs"
