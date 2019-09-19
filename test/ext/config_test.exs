@@ -1,6 +1,5 @@
 defmodule Ext.ConfigTest do
   use ExUnit.Case
-  import Mock
 
   describe ".get" do
     test "is atom" do
@@ -26,7 +25,7 @@ defmodule Ext.ConfigTest do
       assert docker == nil
 
       docker_user_name = Ext.Config.get([:for_test, :docker_1, :user_name])
-      assert docker == nil
+      assert docker_user_name == nil
     end
 
     test "is list for keywords" do
