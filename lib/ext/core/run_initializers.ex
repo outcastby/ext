@@ -1,4 +1,4 @@
-defmodule RunInitializers do
+defmodule Ext.RunInitializers do
   @moduledoc false
 
   def call(app_name) do
