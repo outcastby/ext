@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Types.Scalar.Date do
+defmodule Ext.GQL.Types.Scalar.Date do
   @moduledoc """
   """
   use Absinthe.Schema.Notation

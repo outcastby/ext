@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Schema do
+defmodule Ext.GQL.Schema do
   defmacro __using__(project_name: project_name) do
     quote bind_quoted: [project_name: project_name] do
       use Absinthe.Schema

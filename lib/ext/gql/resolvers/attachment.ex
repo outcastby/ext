@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Resolvers.Attachment do
+defmodule Ext.GQL.Resolvers.Attachment do
   @moduledoc false
 
   def url(uploader) do

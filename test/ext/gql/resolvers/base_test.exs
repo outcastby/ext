@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Resolvers.BaseTest do
+defmodule Ext.GQL.Resolvers.BaseTest do
   use ExUnit.Case
   import Mock
   require IEx
@@ -12,7 +12,7 @@ defmodule Ext.Gql.Resolvers.BaseTest do
         all: fn _ -> test_assoc_list end
       ) do
         {entity_params, preload_assoc} =
-          Ext.Gql.Resolvers.Base.build_assoc_data(TestUser, TestRepoForMock, %{
+          Ext.GQL.Resolvers.Base.build_assoc_data(TestUser, TestRepoForMock, %{
             name: "test_name",
             test_many_assocs: [1, 2]
           })
@@ -27,7 +27,7 @@ defmodule Ext.Gql.Resolvers.BaseTest do
       assoc_entity = %TestOneAssoc{id: 1, field: "test"}
 
       {entity_params, preload_assoc} =
-        Ext.Gql.Resolvers.Base.build_assoc_data(TestUser, TestRepo, %{name: "test_name", test_one_assoc: assoc_entity})
+        Ext.GQL.Resolvers.Base.build_assoc_data(TestUser, TestRepo, %{name: "test_name", test_one_assoc: assoc_entity})
 
       assert entity_params == %{name: "test_name", test_one_assoc: assoc_entity}
       assert preload_assoc == [:test_one_assoc]

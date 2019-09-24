@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Resolvers.CoordsTest do
+defmodule Ext.GQL.Resolvers.CoordsTest do
   use ExUnit.Case
 
   describe ".call" do
@@ -6,7 +6,7 @@ defmodule Ext.Gql.Resolvers.CoordsTest do
       entity = %{pickup: %{coordinates: {2, 1}}}
 
       {:ok, %{lat: lat, long: long}} =
-        Ext.Gql.Resolvers.Coords.call().(entity, nil, %{definition: %{schema_node: %{identifier: :pickup}}})
+        Ext.GQL.Resolvers.Coords.call().(entity, nil, %{definition: %{schema_node: %{identifier: :pickup}}})
 
       assert lat == 1
       assert long == 2
@@ -16,7 +16,7 @@ defmodule Ext.Gql.Resolvers.CoordsTest do
       entity = %{pickup: nil}
 
       {:ok, %{lat: lat, long: long}} =
-        Ext.Gql.Resolvers.Coords.call().(entity, nil, %{definition: %{schema_node: %{identifier: :pickup}}})
+        Ext.GQL.Resolvers.Coords.call().(entity, nil, %{definition: %{schema_node: %{identifier: :pickup}}})
 
       assert lat == nil
       assert long == nil

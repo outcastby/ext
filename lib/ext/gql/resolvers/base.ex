@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Resolvers.Base do
+defmodule Ext.GQL.Resolvers.Base do
   @moduledoc false
   require IEx
   require Ecto.Query
@@ -10,7 +10,7 @@ defmodule Ext.Gql.Resolvers.Base do
       require IEx
 
       def send_errors(form, code \\ 400, message \\ "Validation Error") do
-        Ext.Gql.Resolvers.Base.send_errors(form, code, message)
+        Ext.GQL.Resolvers.Base.send_errors(form, code, message)
       end
     end
   end
@@ -20,13 +20,13 @@ defmodule Ext.Gql.Resolvers.Base do
 
     ## Examples
 
-      iex> Ext.Gql.Resolvers.Base.send_errors(TestUser.changeset(%TestUser{}, %{}))
+      iex> Ext.GQL.Resolvers.Base.send_errors(TestUser.changeset(%TestUser{}, %{}))
       {:error, message: "Validation Error", code: 400, details: %{"email" => ["can't be blank"], "name" => ["can't be blank"]}}
 
-      iex> Ext.Gql.Resolvers.Base.send_errors({:error_message, %{error_details: "error_details"}})
+      iex> Ext.GQL.Resolvers.Base.send_errors({:error_message, %{error_details: "error_details"}})
       {:error, message: :error_message, details: %{"errorDetails" => "error_details"}, code: 400}
 
-      iex> Ext.Gql.Resolvers.Base.send_errors(:error_message)
+      iex> Ext.GQL.Resolvers.Base.send_errors(:error_message)
       {:error, message: :error_message, code: 400}
   """
 

@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Types.Coords do
+defmodule Ext.GQL.Types.Coords do
   use Absinthe.Schema.Notation
 
   object :coords do

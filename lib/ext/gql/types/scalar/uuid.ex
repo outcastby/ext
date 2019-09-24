@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Types.Scalar.UUID do
+defmodule Ext.GQL.Types.Scalar.UUID do
   @moduledoc """
   The UUID scalar type allows UUID4 compliant strings to be passed in and out.
   Requires `{ :ecto, ">= 0.0.0" }` package: https://github.com/elixir-ecto/ecto

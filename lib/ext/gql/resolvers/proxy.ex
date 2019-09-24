@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Resolvers.Proxy do
+defmodule Ext.GQL.Resolvers.Proxy do
   require IEx
 
   @moduledoc """
@@ -6,22 +6,22 @@ defmodule Ext.Gql.Resolvers.Proxy do
 
     ## Examples with function call
 
-      iex> Ext.Gql.Resolvers.Proxy.call(:spin, 0).(%{spin: 1}, %{}, %{})
+      iex> Ext.GQL.Resolvers.Proxy.call(:spin, 0).(%{spin: 1}, %{}, %{})
       {:ok, 1}
 
-      iex> Ext.Gql.Resolvers.Proxy.call(:spin, 0).(%{spin: nil}, %{}, %{})
+      iex> Ext.GQL.Resolvers.Proxy.call(:spin, 0).(%{spin: nil}, %{}, %{})
       {:ok, 0}
 
-      iex> Ext.Gql.Resolvers.Proxy.call([:extra, :test]).(%{extra: %{test: "test"}}, %{}, %{})
+      iex> Ext.GQL.Resolvers.Proxy.call([:extra, :test]).(%{extra: %{test: "test"}}, %{}, %{})
       {:ok, "test"}
 
-      iex> Ext.Gql.Resolvers.Proxy.call([:extra, :test]).(%{extra: %{test: nil}}, %{}, %{})
+      iex> Ext.GQL.Resolvers.Proxy.call([:extra, :test]).(%{extra: %{test: nil}}, %{}, %{})
       {:ok, nil}
 
-      iex> Ext.Gql.Resolvers.Proxy.call(10).(%{spin: 11}, %{}, %{definition: %{schema_node: %{identifier: :spin}}})
+      iex> Ext.GQL.Resolvers.Proxy.call(10).(%{spin: 11}, %{}, %{definition: %{schema_node: %{identifier: :spin}}})
       {:ok, 11}
 
-      iex> Ext.Gql.Resolvers.Proxy.call(10).(%{spin: nil}, %{}, %{definition: %{schema_node: %{identifier: :spin}}})
+      iex> Ext.GQL.Resolvers.Proxy.call(10).(%{spin: nil}, %{}, %{definition: %{schema_node: %{identifier: :spin}}})
       {:ok, 10}
   """
 

@@ -1,4 +1,4 @@
-defmodule Ext.Gql.GetQueryNames do
+defmodule Ext.GQL.GetQueryNames do
   require IEx
 
   def call(query) do

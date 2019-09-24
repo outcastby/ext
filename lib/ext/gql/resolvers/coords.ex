@@ -1,4 +1,4 @@
-defmodule Ext.Gql.Resolvers.Coords do
+defmodule Ext.GQL.Resolvers.Coords do
   def call do
     fn entity, _args, %{definition: %{schema_node: %{identifier: identifier}}} ->
       case Map.get(entity, identifier) do
