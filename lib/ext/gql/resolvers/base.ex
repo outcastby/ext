@@ -151,7 +151,7 @@ defmodule Ext.GQL.Resolvers.Base do
   def valid?(nil, _), do: true
 
   def valid?(form_module, entity_params) do
-    form = form_module.changeset(entity_params)
+    form = form_module.call(entity_params)
     if form.valid?, do: true, else: form
   end
 
