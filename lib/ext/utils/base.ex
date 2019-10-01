@@ -259,4 +259,11 @@ defmodule Ext.Utils.Base do
       :error -> false
     end
   end
+
+  def json?(value) do
+    Jason.decode!(value)
+    true
+  rescue
+    _ -> false
+  end
 end
