@@ -79,6 +79,19 @@ defmodule Ext.GQL.Resolvers.Base do
     fn %{id: id}, _ -> get(schema, id, preload, repo) end
   end
 
+  def fetch(schema, preload \\ [], repo \\ nil) do
+    fn
+      %{id: id}, _ ->
+        case get(schema, id, preload, repo) do
+          {:ok, entity} -> {:ok, [entity]}
+          error -> error
+        end
+
+      args, _ ->
+        all(schema, preload, repo).(args, %{})
+    end
+  end
+
   def update(args) when is_map(args) do
     {schema, repo, form_module, scope} = parse_args(args)
     update(schema, repo, form_module, scope)
@@ -126,7 +139,10 @@ defmodule Ext.GQL.Resolvers.Base do
     end
   end
 
-  def delete(schema, repo \\ nil, scope \\ %{}) do
+  #  DEPRECATED
+  def delete(schema, repo \\ nil, scope \\ %{}), do: remove(schema, repo, scope)
+
+  def remove(schema, repo \\ nil, scope \\ %{}) do
     {_, repo} = Ext.Utils.Repo.get_config(repo)
 
     fn %{id: id}, _info ->
