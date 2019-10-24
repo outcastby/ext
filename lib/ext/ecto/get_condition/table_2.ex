@@ -10,7 +10,10 @@ defmodule Ext.Ecto.GetCondition.Table2 do
     do:
       dynamic(
         [entity, assoc1, assoc2],
-        like(fragment("lower(?)", field(assoc2, ^key)), fragment("lower(?)", ^"%#{value}%"))
+        like(
+          fragment("lower(?)", fragment("cast(? as TEXT)", field(assoc2, ^key))),
+          fragment("lower(?)", ^"%#{value}%")
+        )
       )
 
   def call({key, value}, %{type: "="}) when is_list(value),
