@@ -35,6 +35,10 @@ defmodule Ext.Logger.Rollbar.ErrorSend do
     {:ok, state}
   end
 
+  def handle_info(_message, state) do
+    {:ok, state}
+  end
+
   defp configure(name, opts) do
     state = %{
       name: nil,
