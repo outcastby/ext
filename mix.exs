@@ -15,7 +15,7 @@ defmodule Ext.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:lager, :logger]
     ]
   end
 
@@ -35,7 +35,7 @@ defmodule Ext.MixProject do
       {:blankable, "~> 0.0.1"},
       {:postgrex, ">= 0.0.0-rc"},
       {:plug_cowboy, "~> 2.0"},
-      {:logger_file_backend, "~> 0.0.10"},
+      {:logger_lager_backend, "~> 0.1.0"},
       {:mock, "0.3.3", only: :test},
       {:ja_serializer, "~> 0.13.0"},
       {:ecto_enum, "~> 1.0"},
