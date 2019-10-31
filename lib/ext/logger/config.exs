@@ -5,6 +5,7 @@ format = "$date $time $metadata[$level] $message\n"
 
 config :logger,
   format: format,
+  handle_otp_reports: false,
   backends: [:console, LoggerLagerBackend, {Ext.Logger.Rollbar.ErrorSend, :error_log}]
 
 config :logger, :console,
