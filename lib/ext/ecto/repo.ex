@@ -137,6 +137,23 @@ defmodule Ext.Ecto.Repo do
 
       def join(query, association, type), do: query |> join(type, [entity], assoc in assoc(entity, ^association))
 
+      def get_each(query, batch_size \\ 500) do
+        batches_stream =
+          Stream.unfold(0, fn
+            :done ->
+              nil
+
+            offset ->
+              results = query |> limit(^batch_size) |> offset(^offset) |> __MODULE__.all()
+
+              if length(results) < batch_size,
+                do: {results, :done},
+                else: {results, offset + batch_size}
+          end)
+
+        Stream.concat(batches_stream)
+      end
+
       defp nested_join(query, params, type) when is_list(params),
         do: Enum.reduce(params, query, &nested_join(&2, &1, type))
 
