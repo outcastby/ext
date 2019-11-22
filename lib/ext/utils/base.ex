@@ -9,13 +9,37 @@ defmodule Ext.Utils.Base do
 
     ##Examples
 
+      iex> Ext.Utils.Base.to_int(1.3)
+      1
+
+      iex> Ext.Utils.Base.to_int(1.5)
+      2
+
+      iex> Ext.Utils.Base.to_int(1.0, :ceil)
+      1
+
+      iex> Ext.Utils.Base.to_int(1.1, :ceil)
+      2
+
+      iex> Ext.Utils.Base.to_int(0.0, :ceil)
+      0
+
+      iex> Ext.Utils.Base.to_int(1.5, :floor)
+      1
+
       iex> Ext.Utils.Base.to_int("11")
       11
 
       iex> Ext.Utils.Base.to_int("error")
       "error"
   """
-  def to_int(value) do
+
+  def to_int(value, type \\ nil)
+
+  def to_int(value, :ceil) when is_float(value), do: value |> Float.ceil() |> trunc()
+  def to_int(value, :floor) when is_float(value), do: value |> Float.floor() |> trunc()
+  def to_int(value, _) when is_float(value), do: round(value)
+  def to_int(value, _) do
     case :string.to_integer(value) do
       {:error, _} -> value
       {int, _} -> int
