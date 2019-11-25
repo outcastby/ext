@@ -39,6 +39,7 @@ defmodule Ext.Utils.Base do
   def to_int(value, :ceil) when is_float(value), do: value |> Float.ceil() |> trunc()
   def to_int(value, :floor) when is_float(value), do: value |> Float.floor() |> trunc()
   def to_int(value, _) when is_float(value), do: round(value)
+
   def to_int(value, _) do
     case :string.to_integer(value) do
       {:error, _} -> value
@@ -183,7 +184,11 @@ defmodule Ext.Utils.Base do
 
       iex> Ext.Utils.Base.get_in(%TestUser{name: "test"}, [:invalid_field])
       nil
+
+      iex> Ext.Utils.Base.get_in(nil, [:id])
+      nil
   """
+  def get_in(nil, _), do: nil
 
   def get_in(object, list) do
     [source_column | path] = list
