@@ -295,4 +295,27 @@ defmodule Ext.Utils.Base do
   rescue
     _ -> false
   end
+
+  @doc ~S"""
+    Decode and encode Any
+
+    ## Examples
+
+      iex> Ext.Utils.Base.encode(11)
+      "g2EL"
+
+      iex> Ext.Utils.Base.decode("g2EL")
+      11
+
+      iex> Ext.Utils.Base.encode({11, "aa"})
+      "g2gCYQttAAAAAmFh"
+
+      iex> Ext.Utils.Base.decode("g2gCYQttAAAAAmFh")
+      {11, "aa"}
+  """
+  @spec decode(any) :: String.t()
+  def decode(any), do: any |> Base.decode64!() |> :erlang.binary_to_term()
+
+  @spec decode(String.t()) :: any
+  def encode(any), do: any |> :erlang.term_to_binary() |> Base.encode64()
 end
