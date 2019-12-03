@@ -30,7 +30,7 @@ config :logger,
   format: format,
   backends:
     [:console | file_backends] ++
-      if(Code.ensure_compiled?(Rollbax), do: [{Ext.Logger.Rollbar.ErrorSend, :error_log}], else: [])
+      if(System.get_env("ENABLE_ROLLBAR") == "true", do: [{Ext.Logger.Rollbar.ErrorSend, :error_log}], else: [])
 
 config :logger, :error_log,
   path: "log/error.log",
