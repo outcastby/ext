@@ -3,6 +3,7 @@ defmodule Ext.Logger.Rollbar.ErrorSend do
 
   @behaviour :gen_event
   require IEx
+  require Logger
 
   @type path :: String.t()
   @type file :: :file.io_device()
@@ -22,18 +23,17 @@ defmodule Ext.Logger.Rollbar.ErrorSend do
     {:ok, configure(name, [])}
   end
 
-  def handle_event({level, _pid, data}, state) do
-    if level == :error do
-      {_logger, message, _date, stacktrace} = data
-      Rollbax.report_message(level, "#{message}\n#{inspect(stacktrace)}")
+  def handle_event({:error, gl, {_logger, message, _date, stacktrace}}, state) when node(gl) == node() do
+    Logger.info("ErrorSend handler, gl=#{inspect(node(gl))}, node=#{inspect(node())}, message=#{inspect(message)}")
+
+    unless message =~ "(Rollbax)" do
+      Rollbax.report_message(:error, "#{message}\n\n#{inspect(stacktrace)}")
     end
 
     {:ok, state}
   end
 
-  def handle_event(_process, state) do
-    {:ok, state}
-  end
+  def handle_event(_process, state), do: {:ok, state}
 
   def handle_info(_message, state) do
     {:ok, state}
