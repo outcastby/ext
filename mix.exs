@@ -40,7 +40,8 @@ defmodule Ext.MixProject do
       {:ja_serializer, "~> 0.13.0"},
       {:ecto_enum, "~> 1.0"},
       {:dataloader, "~> 1.0.0"},
-      {:redix, ">= 0.0.0"}
+      {:redix, ">= 0.0.0"},
+      {:exlogger, "~> 0.1.0"}
     ]
   end
 end
