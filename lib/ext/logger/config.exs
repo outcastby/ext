@@ -32,6 +32,6 @@ config :logger, :console, format: format, metadata: metadata
 
 config :logger, :common_json_log,
   path: "log/common.json.log",
-  format: {ExLogger, :format},
+  format: {Ext.Logger.Json, :format},
   metadata: metadata,
   level: "LOG_LEVEL" |> System.get_env("debug") |> String.to_atom()
